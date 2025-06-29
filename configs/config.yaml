@@ -1,0 +1,12 @@
+client:
+  base_url: "http://localhost:8080"
+  timeout: 5
+logging:
+  level: "info"
+  format: "text"
+  output: "stdout"
+  file: ""
+  max_size: 100
+  max_backups: 3
+  max_age: 30
+  compress: false

@@ -1,0 +1,13 @@
+{
+  "$schema": "https://wails.io/schemas/config.v2.json",
+  "name": "desktop-app-golang",
+  "outputfilename": "desktop-app-golang",
+  "frontend:install": "pnpm install",
+  "frontend:build": "pnpm run build",
+  "frontend:dev:watcher": "pnpm run dev",
+  "frontend:dev:serverUrl": "auto",
+  "author": {
+    "name": "linhdt-pgts",
+    "email": "linh.dt@pgt-solutions.io"
+  }
+}
