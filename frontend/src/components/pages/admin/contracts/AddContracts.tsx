@@ -36,17 +36,13 @@ import { Textarea } from "@/components/ui/textarea";
 // import { Gender, UserRole, UserStatus } from "@/enums";
 // import { RoomStatus } from "@/enums/rooms";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
-import { CreateContract } from "@/interfaces/contract";
+import { CreateContract as ICreateContract } from "@/interfaces/contract";
 import { Room } from "@/interfaces/room";
-import { IResponse } from "@/interfaces/service";
 import {
   User as IUser,
   // User as UserType
 } from "@/interfaces/user";
 import { cn } from "@/lib/utils";
-import { contractsService } from "@/services/apis/contracts";
-import { roomService } from "@/services/apis/rooms";
-import { usersService } from "@/services/apis/users";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   useInfiniteQuery,
@@ -71,6 +67,7 @@ import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import * as z from "zod";
+import { GetListUsers, GetListRooms, CreateContract } from "wailsjs/go/app/App";
 
 const contractSchema = z.object({
   user_id: z.number({
@@ -108,18 +105,15 @@ export default function AddContracts() {
     isFetchingNextPage: isFetchingNextStudentsPage,
     isLoading: isLoadingStudents,
     isError: isStudentsError,
-  } = useInfiniteQuery<IResponse<IUser[]>>({
+  } = useInfiniteQuery({
     queryKey: ["students-infinite"],
-    queryFn: ({ pageParam = 1 }) => {
-      console.log(`🔍 Fetching students page: ${pageParam}`);
-      return usersService.getAll({ page: pageParam as number });
-    },
+    queryFn: ({ pageParam = 1 }) => GetListUsers(pageParam as number),
     initialPageParam: 1,
     getNextPageParam: (lastPage, allPages) => {
-      const hasMore = lastPage.data.length >= 10;
+      const hasMore = lastPage.RawResponse?.Body?.data.length >= 10;
       const nextPage = hasMore ? allPages.length + 1 : undefined;
       console.log(`📄 Students getNextPageParam:`, {
-        currentItems: lastPage.data.length,
+        currentItems: lastPage.RawResponse?.Body?.data.length,
         totalPages: allPages.length,
         nextPage,
       });
@@ -136,18 +130,15 @@ export default function AddContracts() {
     isFetchingNextPage: isFetchingNextRoomsPage,
     isLoading: isLoadingRooms,
     isError: isRoomsError,
-  } = useInfiniteQuery<IResponse<Room[]>>({
+  } = useInfiniteQuery({
     queryKey: ["rooms-infinite"],
-    queryFn: ({ pageParam = 1 }) => {
-      console.log(`🏠 Fetching rooms page: ${pageParam}`);
-      return roomService.listRooms({ page: pageParam as number });
-    },
+    queryFn: ({ pageParam = 1 }) => GetListRooms(pageParam as number),
     initialPageParam: 1,
     getNextPageParam: (lastPage, allPages) => {
-      const hasMore = lastPage.data.length >= 10;
+      const hasMore = lastPage.RawResponse?.Body?.data.length >= 10;
       const nextPage = hasMore ? allPages.length + 1 : undefined;
       console.log(`📄 Rooms getNextPageParam:`, {
-        currentItems: lastPage.data.length,
+        currentItems: lastPage.RawResponse?.Body?.data.length,
         totalPages: allPages.length,
         nextPage,
       });
@@ -175,12 +166,14 @@ export default function AddContracts() {
   });
 
   const allStudents = useMemo(
-    () => studentsData?.pages.flatMap((page) => page.data) ?? [],
+    () =>
+      studentsData?.pages.flatMap((page) => page.RawResponse?.Body?.data) ?? [],
     [studentsData]
   );
 
   const allRooms = useMemo(
-    () => roomsData?.pages.flatMap((page) => page.data) ?? [],
+    () =>
+      roomsData?.pages.flatMap((page) => page.RawResponse?.Body?.data) ?? [],
     [roomsData]
   );
 
@@ -194,7 +187,7 @@ export default function AddContracts() {
   });
 
   const { mutateAsync, isPending } = useMutation({
-    mutationFn: (data: CreateContract) => contractsService.createContract(data),
+    mutationFn: (data: ICreateContract) => CreateContract(data),
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: ["contracts"],
@@ -206,7 +199,7 @@ export default function AddContracts() {
 
   const onSubmit = useCallback(
     (data: ContractFormData) => {
-      const formattedData: CreateContract = {
+      const formattedData: ICreateContract = {
         user_id: +data.user_id,
         room_id: +data.room_id,
         start_date: data.start_date,

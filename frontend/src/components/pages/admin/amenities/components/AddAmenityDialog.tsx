@@ -21,8 +21,8 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { amenitiesService } from "@/services/apis/amenities";
 import { CreateFacility } from "@/interfaces/facility";
+import { CreateAmenity } from "wailsjs/go/app/App";
 
 const formSchema = z.object({
   name: z.string().min(1, "Vui lòng nhập tên tiện nghi"),
@@ -47,7 +47,7 @@ export default function AddAmenityDialog({
   });
 
   const { mutateAsync, isPending } = useMutation({
-    mutationFn: (data: CreateFacility) => amenitiesService.create(data),
+    mutationFn: (data: CreateFacility) => CreateAmenity(data),
     onSuccess() {
       onOpenChange(false);
       queryClient.refetchQueries({

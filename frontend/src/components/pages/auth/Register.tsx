@@ -3,7 +3,6 @@ import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { LockKeyhole, Mail, User, Phone, UserPlus } from "lucide-react";
-
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -25,7 +24,8 @@ import { Input } from "@/components/ui/input";
 import { PasswordInput } from "@/components/ui/password-input";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { authService, RegisterData } from "@/services/apis/auth";
+import { RegisterData } from "@/interfaces/auth";
+import { Register } from "wailsjs/go/app/App";
 
 // Schema for form validation
 const registerSchema = z
@@ -48,10 +48,11 @@ const registerSchema = z
 
 type RegisterFormValues = z.infer<typeof registerSchema>;
 
-export default function Register() {
+export default function RegisterComponent() {
   const navigate = useNavigate();
   const { mutateAsync, isPending } = useMutation({
-    mutationFn: (values: RegisterData) => authService.register(values),
+    mutationFn: (values: RegisterData) =>
+      Register(values.email, values.password, values.fullName, values.phone),
     onSuccess: () => {
       navigate("/auth/login");
     },
@@ -75,7 +76,7 @@ export default function Register() {
       email: values.email,
       phone: values.phone,
       password: values.password,
-      full_name: values.fullName,
+      fullName: values.fullName,
     };
     toast.promise(mutateAsync(data), {
       loading: "Đang đăng ký...",

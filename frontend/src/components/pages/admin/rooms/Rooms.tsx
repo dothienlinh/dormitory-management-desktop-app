@@ -27,11 +27,9 @@ import {
 } from "@/components/ui/card";
 import { PlusCircle, Search, Filter } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
-import { roomService } from "@/services/apis/rooms";
 import { Icons } from "@/components/ui/icons";
 import { RoomStatus } from "@/enums/rooms";
-import { IResponse } from "@/interfaces/service";
-import { Room } from "@/interfaces/room";
+import { GetListRooms } from "wailsjs/go/app/App";
 
 const getStatusText = (status: string) => {
   switch (status) {
@@ -64,9 +62,9 @@ export default function Rooms() {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
 
-  const { data: listRoom, isLoading } = useQuery<IResponse<Room[]>>({
+  const { data: listRoom, isLoading } = useQuery({
     queryKey: ["rooms"],
-    queryFn: () => roomService.listRooms(),
+    queryFn: () => GetListRooms(1),
   });
 
   return (
@@ -88,15 +86,24 @@ export default function Rooms() {
         <CardHeader>
           <CardTitle>Danh sách phòng</CardTitle>
           <CardDescription>
-            Tổng cộng {listRoom?.data.length} phòng,{" "}
-            {listRoom?.data.filter((r) => r.status === "occupied").length} đã
-            thuê,{" "}
+            Tổng cộng {listRoom?.RawResponse?.Body?.data.length} phòng,{" "}
             {
-              listRoom?.data.filter((r) => r.status === RoomStatus.AVAILABLE)
-                .length
+              listRoom?.RawResponse?.Body?.data.filter(
+                (r: { status: string }) => r.status === "occupied"
+              ).length
+            }{" "}
+            đã thuê,{" "}
+            {
+              listRoom?.RawResponse?.Body?.data.filter(
+                (r: { status: string }) => r.status === RoomStatus.AVAILABLE
+              ).length
             }{" "}
             trống,{" "}
-            {listRoom?.data.filter((r) => r.status === "maintenance").length}{" "}
+            {
+              listRoom?.RawResponse?.Body?.data.filter(
+                (r: { status: string }) => r.status === "maintenance"
+              ).length
+            }{" "}
             đang bảo trì
           </CardDescription>
         </CardHeader>
@@ -147,35 +154,47 @@ export default function Rooms() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {listRoom && listRoom.data.length > 0 ? (
-                    listRoom?.data.map((room) => (
-                      <TableRow key={room.id}>
-                        <TableCell className="font-medium">
-                          {room.room_number}
-                        </TableCell>
-                        <TableCell>{room.room_category?.name}</TableCell>
-                        <TableCell>{room.room_category?.capacity}</TableCell>
-                        <TableCell>{room.user_count}</TableCell>
-                        <TableCell>
-                          <Badge
-                            variant="outline"
-                            className={getStatusColor(room.status)}
-                          >
-                            {getStatusText(room.status)}
-                          </Badge>
-                        </TableCell>
-                        <TableCell>
-                          {room.room_category?.price.toLocaleString() ?? 0}
-                        </TableCell>
-                        <TableCell>
-                          <Link to={`/admin/rooms/${room.id}`}>
-                            <Button variant="link" size="sm">
-                              Chi tiết
-                            </Button>
-                          </Link>
-                        </TableCell>
-                      </TableRow>
-                    ))
+                  {listRoom && listRoom.RawResponse?.Body?.data.length > 0 ? (
+                    listRoom.RawResponse?.Body?.data.map(
+                      (room: {
+                        id: number;
+                        room_number: string;
+                        room_category: {
+                          name: string;
+                          capacity: number;
+                          price: number;
+                        };
+                        user_count: number;
+                        status: RoomStatus;
+                      }) => (
+                        <TableRow key={room.id}>
+                          <TableCell className="font-medium">
+                            {room.room_number}
+                          </TableCell>
+                          <TableCell>{room.room_category?.name}</TableCell>
+                          <TableCell>{room.room_category?.capacity}</TableCell>
+                          <TableCell>{room.user_count}</TableCell>
+                          <TableCell>
+                            <Badge
+                              variant="outline"
+                              className={getStatusColor(room.status)}
+                            >
+                              {getStatusText(room.status)}
+                            </Badge>
+                          </TableCell>
+                          <TableCell>
+                            {room.room_category?.price.toLocaleString() ?? 0}
+                          </TableCell>
+                          <TableCell>
+                            <Link to={`/admin/rooms/${room.id}`}>
+                              <Button variant="link" size="sm">
+                                Chi tiết
+                              </Button>
+                            </Link>
+                          </TableCell>
+                        </TableRow>
+                      )
+                    )
                   ) : (
                     <TableRow>
                       <TableCell colSpan={8} className="h-24 text-center">

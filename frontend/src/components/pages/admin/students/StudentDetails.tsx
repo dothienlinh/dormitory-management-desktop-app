@@ -18,18 +18,16 @@ import { StudentProfile } from "./components/StudentProfile";
 // import { ContractHistory } from "./components/ContractHistory";
 // import { PaymentHistory } from "./components/PaymentHistory";
 // import { DisciplinaryRecords } from "./components/DisciplinaryRecords";
-import { IResponse } from "@/interfaces/service";
-import { User } from "@/interfaces/user";
-import { usersService } from "@/services/apis/users";
 import { useQuery } from "@tanstack/react-query";
 import { Icons } from "@/components/ui/icons";
+import { GetUserDetails } from "wailsjs/go/app/App";
 
 export default function StudentDetails() {
   const { id } = useParams<{ id: string }>();
 
-  const { data: student, isLoading } = useQuery<IResponse<User>>({
+  const { data: student, isLoading } = useQuery({
     queryKey: ["user", id],
-    queryFn: () => usersService.getById(id ? +id : 0),
+    queryFn: () => GetUserDetails(id ? id : "0"),
   });
 
   if (isLoading) {
@@ -74,10 +72,10 @@ export default function StudentDetails() {
           </Link>
           <div>
             <h2 className="text-3xl font-bold tracking-tight">
-              {student.data.full_name}
+              {student.RawResponse?.Body.data.full_name}
             </h2>
             <p className="text-muted-foreground">
-              MSSV: {student.data.student_code}
+              MSSV: {student.RawResponse?.Body.data.student_code}
             </p>
           </div>
         </div>
@@ -90,7 +88,7 @@ export default function StudentDetails() {
       </div>
 
       <div className="grid gap-6 md:grid-cols-6">
-        <StudentProfile student={student.data} />
+        <StudentProfile student={student.RawResponse?.Body.data} />
 
         <Card className="md:col-span-4">
           <Tabs defaultValue="contracts">

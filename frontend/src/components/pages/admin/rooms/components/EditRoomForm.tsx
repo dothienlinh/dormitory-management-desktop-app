@@ -23,13 +23,12 @@ import { useForm, useWatch } from "react-hook-form";
 import { z } from "zod";
 import { Separator } from "@/components/ui/separator";
 import { useMutation } from "@tanstack/react-query";
-import { RoomCategory } from "@/services/apis/roomCategories";
 import { toast } from "sonner";
 import { RoomStatus } from "@/enums/rooms";
 import { useNavigate } from "react-router-dom";
 import { Amenity } from "@/interfaces/amenity";
-import { Room } from "@/interfaces/room";
-import { roomService } from "@/services/apis/rooms";
+import { Room, RoomCategory } from "@/interfaces/room";
+import { UpdateRoom } from "wailsjs/go/app/App";
 
 interface EditRoomFormProps {
   room: Room;
@@ -75,7 +74,7 @@ export default function EditRoomForm({
 
   const { mutateAsync, isPending } = useMutation({
     mutationFn: (data: FormValues) =>
-      roomService.updateRoom(id ? +id : 0, {
+      UpdateRoom(id ? +id : 0, {
         room_number: data.roomNumber,
         status: data.status,
         room_category_id: +data.type,

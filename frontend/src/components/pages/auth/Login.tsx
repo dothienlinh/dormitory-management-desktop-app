@@ -16,13 +16,11 @@ import { Loader2, LockKeyhole } from "lucide-react";
 import { useDispatch } from "react-redux";
 import { setUser } from "@/store/authSlice";
 import { useMutation } from "@tanstack/react-query";
-import { setCookie } from "@/utils/cookie";
 import { MAP_ROLE_TO_PATH } from "@/components/routers/constants";
 import { PasswordInput } from "@/components/ui/password-input";
 import { toast } from "sonner";
-import { authService } from "@/services/apis/auth";
-import { IResponse } from "@/interfaces/service";
-import { Login as ILogin } from "@/interfaces/auth";
+import { Login } from "wailsjs/go/app/App";
+import { UserRole } from "@/enums";
 
 const loginFormSchema = z.object({
   email: z.string().min(1, { message: "Email không được để trống" }).email({
@@ -33,21 +31,17 @@ const loginFormSchema = z.object({
 
 type LoginFormValues = z.infer<typeof loginFormSchema>;
 
-export default function Login() {
+export default function LoginComponent() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const { mutateAsync, isPending } = useMutation({
-    mutationFn: (data: LoginFormValues) =>
-      authService.login({
-        email: data.email,
-        password: data.password,
-      }),
-    onSuccess: (data: IResponse<ILogin>) => {
-      dispatch(setUser(data.data.user));
-      setCookie("accessToken", data.data.access_token, 1);
-      setCookie("refreshToken", data.data.refresh_token, 7);
-      navigate(MAP_ROLE_TO_PATH[data.data.user.role]);
+    mutationFn: (data: LoginFormValues) => Login(data.email, data.password),
+    onSuccess: (data) => {
+      dispatch(setUser(data.RawResponse?.Body.data.user));
+      navigate(
+        MAP_ROLE_TO_PATH[data.RawResponse?.Body.data.user.role as UserRole]
+      );
     },
   });
 

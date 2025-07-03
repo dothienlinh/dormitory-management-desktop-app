@@ -32,16 +32,20 @@ import { z } from "zod";
 import { Separator } from "@/components/ui/separator";
 import { ChevronLeft } from "lucide-react";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import {
-  RoomCategory,
-  roomCategoryService,
-} from "@/services/apis/roomCategories";
 import { Icons } from "@/components/ui/icons";
-import { amenitiesService } from "@/services/apis/amenities";
-import { roomService } from "@/services/apis/rooms";
 import { toast } from "sonner";
-import { IResponse } from "@/interfaces/service";
-import { Amenity } from "@/interfaces/amenity";
+import {
+  CreateRoom,
+  GetListAmenities,
+  GetListRoomCategories,
+} from "wailsjs/go/app/App";
+import {
+  Key,
+  ReactElement,
+  JSXElementConstructor,
+  ReactNode,
+  ReactPortal,
+} from "react";
 
 const formSchema = z.object({
   roomNumber: z
@@ -63,23 +67,20 @@ type FormValues = z.infer<typeof formSchema>;
 export default function AddRoom() {
   const navigate = useNavigate();
 
-  const { data: amenities, isLoading: isLoadingAmenities } = useQuery<
-    IResponse<Amenity[]>
-  >({
+  const { data: amenities, isLoading: isLoadingAmenities } = useQuery({
     queryKey: ["amenities"],
-    queryFn: () => amenitiesService.list(),
+    queryFn: () => GetListAmenities(1),
   });
 
   const { data: listRoomCategories, isLoading: isLoadingListRoomCategories } =
-    useQuery<IResponse<RoomCategory[]>>({
+    useQuery({
       queryKey: ["roomCategories"],
-      queryFn: () =>
-        roomCategoryService.listRoomCategories({ limit: 10, page: 1 }),
+      queryFn: () => GetListRoomCategories("1"),
     });
 
   const { mutateAsync, isPending } = useMutation({
     mutationFn: (data: FormValues) =>
-      roomService.createRoom({
+      CreateRoom({
         room_number: data.roomNumber,
         status: data.status,
         room_category_id: +data.type,
@@ -113,8 +114,8 @@ export default function AddRoom() {
       },
     });
   }
-  const selectedCategory = listRoomCategories?.data.find(
-    (item) => item.id === +type
+  const selectedCategory = listRoomCategories?.RawResponse?.Body?.data.find(
+    (item: { id: number }) => item.id === +type
   );
 
   if (isLoadingListRoomCategories || isLoadingAmenities) {
@@ -186,11 +187,42 @@ export default function AddRoom() {
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          {listRoomCategories?.data?.map((item) => (
-                            <SelectItem key={item.id} value={`${item.id}`}>
-                              {item.name}
-                            </SelectItem>
-                          ))}
+                          {listRoomCategories?.RawResponse?.Body?.data?.map(
+                            (item: {
+                              id: Key | null | undefined;
+                              name:
+                                | string
+                                | number
+                                | bigint
+                                | boolean
+                                | ReactElement<
+                                    unknown,
+                                    string | JSXElementConstructor<any>
+                                  >
+                                | Iterable<ReactNode>
+                                | ReactPortal
+                                | Promise<
+                                    | string
+                                    | number
+                                    | bigint
+                                    | boolean
+                                    | ReactPortal
+                                    | ReactElement<
+                                        unknown,
+                                        string | JSXElementConstructor<any>
+                                      >
+                                    | Iterable<ReactNode>
+                                    | null
+                                    | undefined
+                                  >
+                                | null
+                                | undefined;
+                            }) => (
+                              <SelectItem key={item.id} value={`${item.id}`}>
+                                {item.name}
+                              </SelectItem>
+                            )
+                          )}
                         </SelectContent>
                       </Select>
                       <FormMessage />
@@ -275,42 +307,44 @@ export default function AddRoom() {
               <div>
                 <FormLabel className="mb-2 block">Tiện nghi phòng</FormLabel>
                 <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
-                  {amenities?.data &&
-                    amenities?.data?.map((amenity) => (
-                      <FormField
-                        key={amenity.id}
-                        control={form.control}
-                        name="amenities"
-                        render={({ field }) => (
-                          <FormItem
-                            key={amenity.id}
-                            className="flex items-center space-x-3 space-y-0"
-                          >
-                            <FormControl>
-                              <Checkbox
-                                checked={field.value?.includes(amenity.id)}
-                                onCheckedChange={(checked) => {
-                                  const currentValues = field.value || [];
-                                  return checked
-                                    ? field.onChange([
-                                        ...currentValues,
-                                        amenity.id,
-                                      ])
-                                    : field.onChange(
-                                        currentValues.filter(
-                                          (value) => value !== amenity.id
-                                        )
-                                      );
-                                }}
-                              />
-                            </FormControl>
-                            <FormLabel className="cursor-pointer font-normal">
-                              {amenity.name}
-                            </FormLabel>
-                          </FormItem>
-                        )}
-                      />
-                    ))}
+                  {amenities?.RawResponse?.Body?.data &&
+                    amenities?.RawResponse?.Body?.data.map(
+                      (amenity: { id: number; name: string }) => (
+                        <FormField
+                          key={amenity.id}
+                          control={form.control}
+                          name="amenities"
+                          render={({ field }) => (
+                            <FormItem
+                              key={amenity.id}
+                              className="flex items-center space-x-3 space-y-0"
+                            >
+                              <FormControl>
+                                <Checkbox
+                                  checked={field.value?.includes(amenity.id)}
+                                  onCheckedChange={(checked) => {
+                                    const currentValues = field.value || [];
+                                    return checked
+                                      ? field.onChange([
+                                          ...currentValues,
+                                          amenity.id,
+                                        ])
+                                      : field.onChange(
+                                          currentValues.filter(
+                                            (value) => value !== amenity.id
+                                          )
+                                        );
+                                  }}
+                                />
+                              </FormControl>
+                              <FormLabel className="cursor-pointer font-normal">
+                                {amenity.name}
+                              </FormLabel>
+                            </FormItem>
+                          )}
+                        />
+                      )
+                    )}
                 </div>
               </div>
 

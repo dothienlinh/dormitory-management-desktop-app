@@ -13,9 +13,9 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { useMutation } from "@tanstack/react-query";
-import { roomService } from "@/services/apis/rooms";
 import { toast } from "sonner";
 import { Room } from "@/interfaces/room";
+import { DeleteRoom } from "wailsjs/go/app/App";
 
 type RoomHeaderProps = {
   id: number;
@@ -26,7 +26,7 @@ type RoomHeaderProps = {
 export function RoomHeader({ room, onEdit, id }: RoomHeaderProps) {
   const navigate = useNavigate();
   const { mutateAsync, isPending } = useMutation({
-    mutationFn: () => roomService.deleteRoom(id),
+    mutationFn: () => DeleteRoom(id),
     onSuccess: () => {
       navigate("/admin/rooms");
     },

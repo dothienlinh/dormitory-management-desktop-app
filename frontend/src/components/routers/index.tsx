@@ -10,29 +10,8 @@ import { lazy, Suspense, useEffect } from "react";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store";
 import { MAP_ROLE_TO_PATH, PUBLIC_ROUTES } from "./constants";
-import { useCheckAuth } from "@/hooks/useCheckAuth";
 import Register from "../pages/auth/Register";
 import { Icons } from "../ui/icons";
-
-const StudentLayout = lazy(() => import("@/components/layout/student"));
-const StudentDashboard = lazy(
-  () => import("@/components/pages/student/StudentDashboard")
-);
-const StudentProfile = lazy(
-  () => import("@/components/pages/student/StudentProfile")
-);
-const StudentRoom = lazy(
-  () => import("@/components/pages/student/StudentRoom")
-);
-const StudentContract = lazy(
-  () => import("@/components/pages/student/StudentContract")
-);
-const StudentPayment = lazy(
-  () => import("@/components/pages/student/StudentPayment")
-);
-const StudentIssuesPage = lazy(
-  () => import("@/components/pages/student/StudentIssuesPage")
-);
 
 const AuthLayout = lazy(() => import("@/components/layout/auth"));
 const Login = lazy(() => import("@/components/pages/auth/Login"));
@@ -94,7 +73,6 @@ function ProtectedRoutes() {
   const { user, isAuthenticated } = useSelector(
     (state: RootState) => state.auth
   );
-  const { isLoading } = useCheckAuth();
   const navigate = useNavigate();
 
   const handleRedirect = () => {
@@ -116,14 +94,6 @@ function ProtectedRoutes() {
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isAuthenticated, handleRedirect]);
-
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center h-screen">
-        <Icons.spinner className="h-20 w-20 animate-spin" />
-      </div>
-    );
-  }
 
   return (
     <Suspense
@@ -171,15 +141,6 @@ function ProtectedRoutes() {
 
           <Route path="amenities" element={<Amenities />} />
           {/* <Route path="amenities/:id" element={<AmenityDetails />} /> */}
-        </Route>
-
-        <Route path="student" element={<StudentLayout />}>
-          <Route index element={<StudentDashboard />} />
-          <Route path="profile" element={<StudentProfile />} />
-          <Route path="room" element={<StudentRoom />} />
-          <Route path="contract" element={<StudentContract />} />
-          <Route path="payment" element={<StudentPayment />} />
-          <Route path="issues" element={<StudentIssuesPage />} />
         </Route>
 
         <Route path="*" element={<NotFound />} />

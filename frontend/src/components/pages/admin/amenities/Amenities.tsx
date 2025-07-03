@@ -11,17 +11,15 @@ import { PlusCircle } from "lucide-react";
 import AmenitiesList from "./components/AmenitiesList";
 import AddAmenityDialog from "./components/AddAmenityDialog";
 import { useQuery } from "@tanstack/react-query";
-import { amenitiesService } from "@/services/apis/amenities";
-import { IResponse } from "@/interfaces/service";
-import { Amenity } from "@/interfaces/amenity";
 import { Icons } from "@/components/ui/icons";
+import { GetListAmenities } from "wailsjs/go/app/App";
 
 export default function Amenities() {
   const [openAddDialog, setOpenAddDialog] = useState(false);
 
-  const { data: amenities, isLoading } = useQuery<IResponse<Amenity[]>>({
+  const { data: amenities, isLoading } = useQuery({
     queryKey: ["amenities"],
-    queryFn: () => amenitiesService.list(),
+    queryFn: () => GetListAmenities(1),
   });
 
   if (isLoading) {
@@ -55,7 +53,7 @@ export default function Amenities() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <AmenitiesList amenities={amenities?.data} />
+          <AmenitiesList amenities={amenities?.RawResponse?.Body.data} />
         </CardContent>
       </Card>
 

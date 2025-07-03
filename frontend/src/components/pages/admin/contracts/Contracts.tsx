@@ -1,4 +1,11 @@
-import { useState } from "react";
+import {
+  JSXElementConstructor,
+  Key,
+  ReactElement,
+  ReactNode,
+  ReactPortal,
+  useState,
+} from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import {
   Table,
@@ -27,13 +34,12 @@ import {
 } from "@/components/ui/card";
 import { PlusCircle, Search, Filter, FileDown } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
-import { IResponse } from "@/interfaces/service";
-import { Contract, ContractQueryParams } from "@/interfaces/contract";
-import { contractsService } from "@/services/apis/contracts";
+import { ContractQueryParams } from "@/interfaces/contract";
 import { getStatusColorContract, getStatusTextContract } from "@/utils/getText";
 import { PaginationWithLinks } from "@/components/ui/pagination-with-links";
 import { ContractStatus } from "@/enums/contract";
 import { useDebounce } from "use-debounce";
+import { GetListContracts } from "wailsjs/go/app/App";
 
 export default function Contracts() {
   const navigate = useNavigate();
@@ -44,7 +50,7 @@ export default function Contracts() {
   const [searchParams, setSearchParams] = useSearchParams();
   const currentPage = searchParams.get("page") || 1;
 
-  const { data } = useQuery<IResponse<Contract[]>>({
+  const { data } = useQuery({
     queryKey: [
       "contracts",
       {
@@ -55,11 +61,13 @@ export default function Contracts() {
     ],
     queryFn: (query) => {
       const [, params] = query.queryKey as [string, ContractQueryParams];
-      return contractsService.listContracts(params);
+      return GetListContracts(params?.page || 1, params.keyword);
     },
   });
 
-  const totalPage = data?.total ? Math.ceil(data.total / 10) : 0;
+  const totalPage = data?.RawResponse?.Body?.total
+    ? Math.ceil(data.RawResponse.Body.total / 10)
+    : 0;
 
   const handleResetPage = () => {
     setSearchParams((searchParams) => {
@@ -95,20 +103,26 @@ export default function Contracts() {
         <CardHeader>
           <CardTitle>Danh sách hợp đồng</CardTitle>
           <CardDescription>
-            Tổng số {data?.data.length} hợp đồng,{" "}
+            Tổng số {data?.RawResponse?.Body?.data.length} hợp đồng,{" "}
             {
-              data?.data.filter((c) => c.status === ContractStatus.ACTIVE)
-                .length
+              data?.RawResponse?.Body?.data.filter(
+                (c: { status: ContractStatus }) =>
+                  c.status === ContractStatus.ACTIVE
+              ).length
             }{" "}
             đang hiệu lực,{" "}
             {
-              data?.data.filter((c) => c.status === ContractStatus.INACTIVE)
-                .length
+              data?.RawResponse?.Body?.data.filter(
+                (c: { status: ContractStatus }) =>
+                  c.status === ContractStatus.INACTIVE
+              ).length
             }{" "}
             đã hết hạn,{" "}
             {
-              data?.data.filter((c) => c.status === ContractStatus.CANCELLED)
-                .length
+              data?.RawResponse?.Body?.data.filter(
+                (c: { status: ContractStatus }) =>
+                  c.status === ContractStatus.CANCELLED
+              ).length
             }{" "}
             đã chấm dứt
           </CardDescription>
@@ -168,67 +182,192 @@ export default function Contracts() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {data?.data && data?.data.length > 0 ? (
-                  data.data.map((contract) => (
-                    <TableRow key={contract.id}>
-                      <TableCell className="font-medium">
-                        {contract.code}
-                      </TableCell>
-                      <TableCell>
-                        <Link
-                          to={`/admin/students/${contract.user_id}`}
-                          className="text-blue-600 hover:underline"
-                        >
-                          {contract.user.full_name}
-                        </Link>
-                      </TableCell>
-                      <TableCell>
-                        <Link
-                          to={`/admin/rooms/${contract.room.id}`}
-                          className="text-blue-600 hover:underline"
-                        >
-                          {contract.room.room_number}
-                        </Link>
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex flex-col">
-                          <span className="text-xs">
-                            Từ:{" "}
-                            {new Date(contract.start_date).toLocaleDateString(
-                              "vi-VN"
-                            )}
-                          </span>
-                          <span className="text-xs">
-                            Đến:{" "}
-                            {new Date(contract.end_date).toLocaleDateString(
-                              "vi-VN"
-                            )}
-                          </span>
-                        </div>
-                      </TableCell>
-                      <TableCell>{contract.price.toLocaleString()}</TableCell>
-                      <TableCell>
-                        <Badge
-                          variant="outline"
-                          className={getStatusColorContract(contract.status)}
-                        >
-                          {getStatusTextContract(contract.status)}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>
-                        {new Date(contract.created_at).toLocaleDateString(
-                          "vi-VN"
-                        )}
-                      </TableCell>
-                      <TableCell>
-                        <Link to={`/admin/contracts/${contract.id}`}>
-                          <Button variant="link" size="sm">
-                            Chi tiết
-                          </Button>
-                        </Link>
-                      </TableCell>
-                    </TableRow>
-                  ))
+                {data?.RawResponse?.Body?.data &&
+                data?.RawResponse?.Body?.data.length > 0 ? (
+                  data.RawResponse.Body.data.map(
+                    (contract: {
+                      id: Key | null | undefined;
+                      code:
+                        | string
+                        | number
+                        | bigint
+                        | boolean
+                        | ReactElement<
+                            unknown,
+                            string | JSXElementConstructor<any>
+                          >
+                        | Iterable<ReactNode>
+                        | ReactPortal
+                        | Promise<
+                            | string
+                            | number
+                            | bigint
+                            | boolean
+                            | ReactPortal
+                            | ReactElement<
+                                unknown,
+                                string | JSXElementConstructor<any>
+                              >
+                            | Iterable<ReactNode>
+                            | null
+                            | undefined
+                          >
+                        | null
+                        | undefined;
+                      user_id: any;
+                      user: {
+                        full_name:
+                          | string
+                          | number
+                          | bigint
+                          | boolean
+                          | ReactElement<
+                              unknown,
+                              string | JSXElementConstructor<any>
+                            >
+                          | Iterable<ReactNode>
+                          | ReactPortal
+                          | Promise<
+                              | string
+                              | number
+                              | bigint
+                              | boolean
+                              | ReactPortal
+                              | ReactElement<
+                                  unknown,
+                                  string | JSXElementConstructor<any>
+                                >
+                              | Iterable<ReactNode>
+                              | null
+                              | undefined
+                            >
+                          | null
+                          | undefined;
+                      };
+                      room: {
+                        id: any;
+                        room_number:
+                          | string
+                          | number
+                          | bigint
+                          | boolean
+                          | ReactElement<
+                              unknown,
+                              string | JSXElementConstructor<any>
+                            >
+                          | Iterable<ReactNode>
+                          | ReactPortal
+                          | Promise<
+                              | string
+                              | number
+                              | bigint
+                              | boolean
+                              | ReactPortal
+                              | ReactElement<
+                                  unknown,
+                                  string | JSXElementConstructor<any>
+                                >
+                              | Iterable<ReactNode>
+                              | null
+                              | undefined
+                            >
+                          | null
+                          | undefined;
+                      };
+                      start_date: string | number | Date;
+                      end_date: string | number | Date;
+                      price: {
+                        toLocaleString: () =>
+                          | string
+                          | number
+                          | bigint
+                          | boolean
+                          | ReactElement<
+                              unknown,
+                              string | JSXElementConstructor<any>
+                            >
+                          | Iterable<ReactNode>
+                          | ReactPortal
+                          | Promise<
+                              | string
+                              | number
+                              | bigint
+                              | boolean
+                              | ReactPortal
+                              | ReactElement<
+                                  unknown,
+                                  string | JSXElementConstructor<any>
+                                >
+                              | Iterable<ReactNode>
+                              | null
+                              | undefined
+                            >
+                          | null
+                          | undefined;
+                      };
+                      status: string;
+                      created_at: string | number | Date;
+                    }) => (
+                      <TableRow key={contract.id}>
+                        <TableCell className="font-medium">
+                          {contract.code}
+                        </TableCell>
+                        <TableCell>
+                          <Link
+                            to={`/admin/students/${contract.user_id}`}
+                            className="text-blue-600 hover:underline"
+                          >
+                            {contract.user.full_name}
+                          </Link>
+                        </TableCell>
+                        <TableCell>
+                          <Link
+                            to={`/admin/rooms/${contract.room.id}`}
+                            className="text-blue-600 hover:underline"
+                          >
+                            {contract.room.room_number}
+                          </Link>
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex flex-col">
+                            <span className="text-xs">
+                              Từ:{" "}
+                              {new Date(contract.start_date).toLocaleDateString(
+                                "vi-VN"
+                              )}
+                            </span>
+                            <span className="text-xs">
+                              Đến:{" "}
+                              {new Date(contract.end_date).toLocaleDateString(
+                                "vi-VN"
+                              )}
+                            </span>
+                          </div>
+                        </TableCell>
+                        <TableCell>{contract.price.toLocaleString()}</TableCell>
+                        <TableCell>
+                          <Badge
+                            variant="outline"
+                            className={getStatusColorContract(contract.status)}
+                          >
+                            {getStatusTextContract(contract.status)}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>
+                          {new Date(contract.created_at).toLocaleDateString(
+                            "vi-VN"
+                          )}
+                        </TableCell>
+                        <TableCell>
+                          <Link to={`/admin/contracts/${contract.id}`}>
+                            <Button variant="link" size="sm">
+                              Chi tiết
+                            </Button>
+                          </Link>
+                        </TableCell>
+                      </TableRow>
+                    )
+                  )
                 ) : (
                   <TableRow>
                     <TableCell colSpan={8} className="h-24 text-center">
@@ -243,7 +382,7 @@ export default function Contracts() {
             {totalPage > 1 && status !== "pending" && (
               <PaginationWithLinks
                 page={+currentPage}
-                totalCount={data?.total ?? 0}
+                totalCount={data?.RawResponse?.Body?.total ?? 0}
                 pageSearchParam="page"
               />
             )}

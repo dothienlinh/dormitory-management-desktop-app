@@ -17,10 +17,9 @@ import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { logout } from "@/store/authSlice";
-import { removeCookie } from "@/utils/cookie";
 import { useMutation } from "@tanstack/react-query";
-import { authService } from "@/services/apis/auth";
 import { toast } from "sonner";
+import { Logout } from "wailsjs/go/app/App";
 
 export default function DashboardLayout() {
   const [isDarkMode, setIsDarkMode] = useState(false);
@@ -31,11 +30,9 @@ export default function DashboardLayout() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { mutateAsync } = useMutation({
-    mutationFn: () => authService.logout(),
+    mutationFn: () => Logout(),
     onSuccess: () => {
       dispatch(logout());
-      removeCookie("accessToken");
-      removeCookie("refreshToken");
       navigate("/auth/login");
     },
   });

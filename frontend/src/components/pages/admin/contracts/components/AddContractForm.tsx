@@ -25,14 +25,10 @@ import {
 } from "@/components/ui/popover";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
-import { CreateContract } from "@/interfaces/contract";
+import { CreateContract as ICreateContract } from "@/interfaces/contract";
 import { Room } from "@/interfaces/room";
-import { IResponse } from "@/interfaces/service";
 import { User } from "@/interfaces/user";
 import { cn } from "@/lib/utils";
-import { contractsService } from "@/services/apis/contracts";
-import { roomService } from "@/services/apis/rooms";
-import { usersService } from "@/services/apis/users";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   useInfiniteQuery,
@@ -49,6 +45,7 @@ import {
 import { useCallback, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
+import { CreateContract, GetListRooms, GetListUsers } from "wailsjs/go/app/App";
 import { z } from "zod";
 
 const contractSchema = z
@@ -91,18 +88,18 @@ export function AddContractForm({ onOpenChange }: AddContractFormProps) {
     isFetchingNextPage: isFetchingNextStudentsPage,
     isLoading: isLoadingStudents,
     isError: isStudentsError,
-  } = useInfiniteQuery<IResponse<User[]>>({
+  } = useInfiniteQuery({
     queryKey: ["students-infinite"],
     queryFn: ({ pageParam = 1 }) => {
       console.log(`🔍 Fetching students page: ${pageParam}`);
-      return usersService.getAll({ page: pageParam as number });
+      return GetListUsers(pageParam as number);
     },
     initialPageParam: 1,
     getNextPageParam: (lastPage, allPages) => {
-      const hasMore = lastPage.data.length >= 10;
+      const hasMore = lastPage.RawResponse?.Body.data.length >= 10;
       const nextPage = hasMore ? allPages.length + 1 : undefined;
       console.log(`📄 Students getNextPageParam:`, {
-        currentItems: lastPage.data.length,
+        currentItems: lastPage.RawResponse?.Body.data.length,
         totalPages: allPages.length,
         nextPage,
       });
@@ -119,18 +116,18 @@ export function AddContractForm({ onOpenChange }: AddContractFormProps) {
     isFetchingNextPage: isFetchingNextRoomsPage,
     isLoading: isLoadingRooms,
     isError: isRoomsError,
-  } = useInfiniteQuery<IResponse<Room[]>>({
+  } = useInfiniteQuery({
     queryKey: ["rooms-infinite"],
     queryFn: ({ pageParam = 1 }) => {
       console.log(`🏠 Fetching rooms page: ${pageParam}`);
-      return roomService.listRooms({ page: pageParam as number });
+      return GetListRooms(pageParam as number);
     },
     initialPageParam: 1,
     getNextPageParam: (lastPage, allPages) => {
-      const hasMore = lastPage.data.length >= 10;
+      const hasMore = lastPage.RawResponse?.Body.data.length >= 10;
       const nextPage = hasMore ? allPages.length + 1 : undefined;
       console.log(`📄 Rooms getNextPageParam:`, {
-        currentItems: lastPage.data.length,
+        currentItems: lastPage.RawResponse?.Body.data.length,
         totalPages: allPages.length,
         nextPage,
       });
@@ -158,12 +155,13 @@ export function AddContractForm({ onOpenChange }: AddContractFormProps) {
   });
 
   const allStudents = useMemo(
-    () => studentsData?.pages.flatMap((page) => page.data) ?? [],
+    () =>
+      studentsData?.pages.flatMap((page) => page.RawResponse?.Body.data) ?? [],
     [studentsData]
   );
 
   const allRooms = useMemo(
-    () => roomsData?.pages.flatMap((page) => page.data) ?? [],
+    () => roomsData?.pages.flatMap((page) => page.RawResponse?.Body.data) ?? [],
     [roomsData]
   );
 
@@ -177,7 +175,7 @@ export function AddContractForm({ onOpenChange }: AddContractFormProps) {
   });
 
   const { mutateAsync, isPending } = useMutation({
-    mutationFn: (data: CreateContract) => contractsService.createContract(data),
+    mutationFn: (data: ICreateContract) => CreateContract(data),
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: ["contracts"],
@@ -190,7 +188,7 @@ export function AddContractForm({ onOpenChange }: AddContractFormProps) {
 
   const onSubmit = useCallback(
     (data: ContractFormValues) => {
-      const formattedData: CreateContract = {
+      const formattedData: ICreateContract = {
         user_id: +data.studentId,
         room_id: +data.roomId,
         start_date: data.startDate,

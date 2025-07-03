@@ -5,3 +5,10 @@ export interface Login {
   refresh_token: string;
   user: User;
 }
+
+export interface RegisterData {
+  fullName: string;
+  email: string;
+  phone: string;
+  password: string;
+}

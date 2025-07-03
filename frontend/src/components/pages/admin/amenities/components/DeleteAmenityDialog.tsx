@@ -10,9 +10,9 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
-import { amenitiesService } from "@/services/apis/amenities";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Amenity } from "@/interfaces/amenity";
+import { DeleteAmenity } from "wailsjs/go/app/App";
 
 type DeleteAmenityDialogProps = {
   open: boolean;
@@ -27,7 +27,7 @@ export default function DeleteAmenityDialog({
 }: DeleteAmenityDialogProps) {
   const queryClient = useQueryClient();
   const { mutateAsync, isPending } = useMutation({
-    mutationFn: () => amenitiesService.delete(amenity.id),
+    mutationFn: () => DeleteAmenity(amenity.id.toString()),
     onSuccess() {
       onOpenChange(false);
       queryClient.refetchQueries({

@@ -8,10 +8,8 @@ import { OccupantsTable } from "./components/OccupantsTable";
 import { MaintenanceTable } from "./components/MaintenanceTable";
 import { AddStudentValues } from "./components/AddStudentForm";
 import { useQuery } from "@tanstack/react-query";
-import { roomService } from "@/services/apis/rooms";
 import { Icons } from "@/components/ui/icons";
-import { IResponse } from "@/interfaces/service";
-import { Room } from "@/interfaces/room";
+import { GetRoomDetails } from "wailsjs/go/app/App";
 
 export default function RoomDetails() {
   const { id } = useParams<{ id: string }>();
@@ -20,9 +18,9 @@ export default function RoomDetails() {
   const [openStudentDialog, setOpenStudentDialog] = useState(false);
   const [openMaintenanceDialog, setOpenMaintenanceDialog] = useState(false);
 
-  const { data: room, isLoading } = useQuery<IResponse<Room>>({
+  const { data: room, isLoading } = useQuery({
     queryKey: ["room", id],
-    queryFn: () => roomService.detailRoom(id ? +id : 0),
+    queryFn: () => GetRoomDetails(id ? +id : 0),
   });
 
   const handleAddStudent = (values: AddStudentValues) => {
@@ -32,7 +30,7 @@ export default function RoomDetails() {
       console.log("Adding student:", values);
 
       alert(
-        `Đã thêm sinh viên ${values.name} vào phòng ${room?.data.room_number}`
+        `Đã thêm sinh viên ${values.name} vào phòng ${room?.RawResponse?.Body?.data.room_number}`
       );
 
       setIsAddingStudent(false);
@@ -69,10 +67,14 @@ export default function RoomDetails() {
 
   return (
     <div className="space-y-6">
-      <RoomHeader room={room.data} onEdit={handleEditRoom} id={id ? +id : 0} />
+      <RoomHeader
+        room={room.RawResponse?.Body.data}
+        onEdit={handleEditRoom}
+        id={id ? +id : 0}
+      />
 
       <div className="grid gap-6 md:grid-cols-6">
-        <RoomInfoCard room={room.data} />
+        <RoomInfoCard room={room.RawResponse?.Body.data} />
 
         <Card className="md:col-span-4">
           <Tabs defaultValue="occupants">
@@ -87,7 +89,7 @@ export default function RoomDetails() {
             </CardHeader>
             <CardContent>
               <OccupantsTable
-                room={room.data}
+                room={room.RawResponse?.Body.data}
                 openStudentDialog={openStudentDialog}
                 setOpenStudentDialog={setOpenStudentDialog}
                 isAddingStudent={isAddingStudent}
@@ -95,7 +97,7 @@ export default function RoomDetails() {
               />
 
               <MaintenanceTable
-                room={room.data}
+                room={room.RawResponse?.Body.data}
                 openMaintenanceDialog={openMaintenanceDialog}
                 setOpenMaintenanceDialog={setOpenMaintenanceDialog}
               />

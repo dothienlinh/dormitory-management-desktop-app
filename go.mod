@@ -3,6 +3,7 @@ module changeme
 go 1.22.2
 
 require (
+	github.com/go-resty/resty/v2 v2.16.5
 	github.com/wailsapp/wails/v2 v2.10.1
 	gopkg.in/yaml.v2 v2.4.0
 )

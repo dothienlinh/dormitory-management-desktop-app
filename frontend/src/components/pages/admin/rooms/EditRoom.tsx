@@ -11,38 +11,31 @@ import { ChevronLeft, Loader2 } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { AlertCircle } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
-import { roomService } from "@/services/apis/rooms";
-import { amenitiesService } from "@/services/apis/amenities";
-import {
-  RoomCategory,
-  roomCategoryService,
-} from "@/services/apis/roomCategories";
 import EditRoomForm from "./components/EditRoomForm";
-import { IResponse } from "@/interfaces/service";
-import { Amenity } from "@/interfaces/amenity";
-import { Room } from "@/interfaces/room";
+import {
+  GetListAmenities,
+  GetListRoomCategories,
+  GetRoomDetails,
+} from "wailsjs/go/app/App";
 
 export default function EditRoom() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
 
-  const { data: amenities, isLoading: isLoadingAmenities } = useQuery<
-    IResponse<Amenity[]>
-  >({
+  const { data: amenities, isLoading: isLoadingAmenities } = useQuery({
     queryKey: ["amenities"],
-    queryFn: () => amenitiesService.list(),
+    queryFn: () => GetListAmenities(1),
   });
 
   const { data: listRoomCategories, isLoading: isLoadingListRoomCategories } =
-    useQuery<IResponse<RoomCategory[]>>({
+    useQuery({
       queryKey: ["roomCategories"],
-      queryFn: () =>
-        roomCategoryService.listRoomCategories({ limit: 10, page: 1 }),
+      queryFn: () => GetListRoomCategories("1"),
     });
 
-  const { data: room, isLoading } = useQuery<IResponse<Room>>({
+  const { data: room, isLoading } = useQuery({
     queryKey: ["room", id],
-    queryFn: () => roomService.detailRoom(id ? +id : 0),
+    queryFn: () => GetRoomDetails(id ? +id : 0),
   });
 
   if (isLoading || isLoadingAmenities || isLoadingListRoomCategories) {
@@ -54,13 +47,15 @@ export default function EditRoom() {
     );
   }
 
-  if (!room?.data) {
+  if (!room?.RawResponse?.Body?.data) {
     return (
       <div className="max-w-4xl mx-auto my-6">
         <Alert variant="destructive">
           <AlertCircle className="h-4 w-4" />
           <AlertTitle>Lỗi</AlertTitle>
-          <AlertDescription>{room?.message}</AlertDescription>
+          <AlertDescription>
+            {room?.RawResponse?.Body?.message}
+          </AlertDescription>
         </Alert>
         <div className="mt-4">
           <Button onClick={() => navigate("/admin/rooms")}>
@@ -84,7 +79,7 @@ export default function EditRoom() {
         <div>
           <h2 className="text-3xl font-bold tracking-tight">Chỉnh sửa phòng</h2>
           <p className="text-muted-foreground">
-            Cập nhật thông tin phòng {room?.data.room_number}
+            Cập nhật thông tin phòng {room?.RawResponse?.Body?.data.room_number}
           </p>
         </div>
       </div>
@@ -97,14 +92,18 @@ export default function EditRoom() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          {room?.data && amenities?.data && listRoomCategories?.data && (
-            <EditRoomForm
-              amenities={amenities?.data || []}
-              listRoomCategories={listRoomCategories?.data || []}
-              id={id ? +id : 0}
-              room={room.data}
-            />
-          )}
+          {room?.RawResponse?.Body?.data &&
+            amenities?.RawResponse?.Body?.data &&
+            listRoomCategories?.RawResponse?.Body?.data && (
+              <EditRoomForm
+                amenities={amenities?.RawResponse?.Body?.data || []}
+                listRoomCategories={
+                  listRoomCategories?.RawResponse?.Body?.data || []
+                }
+                id={id ? +id : 0}
+                room={room.RawResponse.Body.data}
+              />
+            )}
         </CardContent>
       </Card>
     </div>

@@ -5,6 +5,7 @@ import (
 	"changeme/internal/config"
 	"embed"
 
+	"github.com/go-resty/resty/v2"
 	"github.com/wailsapp/wails/v2"
 	"github.com/wailsapp/wails/v2/pkg/options"
 	"github.com/wailsapp/wails/v2/pkg/options/assetserver"
@@ -19,7 +20,10 @@ func main() {
 		panic("Failed to load configuration: " + err.Error())
 	}
 
-	app := app.NewApp(cfg)
+	client := resty.New()
+	client.SetBaseURL(cfg.Client.BaseURL)
+
+	app := app.NewApp(client)
 
 	// Create application with options
 	err = wails.Run(&options.App{

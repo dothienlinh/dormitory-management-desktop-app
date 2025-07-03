@@ -25,14 +25,13 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Search, Filter } from "lucide-react";
-import { usersService } from "@/services/apis/users";
 import { useQuery } from "@tanstack/react-query";
 import { User as IUser, UserQueryParams } from "@/interfaces/user";
-import { IResponse } from "@/interfaces/service";
 import { Gender, UserStatus } from "@/enums";
 import { getGenderTextUser, getStatusTextUser } from "@/utils/getText";
 import { PaginationWithLinks } from "@/components/ui/pagination-with-links";
 import { useDebounce } from "use-debounce";
+import { GetListUsers } from "wailsjs/go/app/App";
 
 export default function Students() {
   const [searchTerm, setSearchTerm] = useState<string>();
@@ -43,7 +42,7 @@ export default function Students() {
   const [searchParams, setSearchParams] = useSearchParams();
   const currentPage = searchParams.get("page") || 1;
 
-  const { data: listStudent, status } = useQuery<IResponse<IUser[]>>({
+  const { data: listStudent, status } = useQuery({
     queryKey: [
       "users",
       {
@@ -55,10 +54,18 @@ export default function Students() {
     ],
     queryFn: (query) => {
       const [, params] = query.queryKey as [string, UserQueryParams];
-      return usersService.getAll(params);
+      return GetListUsers(
+        params.page || 1,
+        params.keyword,
+        params.order,
+        params.status,
+        params.gender
+      );
     },
   });
-  const totalPage = listStudent?.total ? Math.ceil(listStudent.total / 10) : 0;
+  const totalPage = listStudent?.RawResponse?.Body?.total
+    ? Math.ceil(listStudent.RawResponse.Body.total / 10)
+    : 0;
 
   const handleResetPage = () => {
     setSearchParams((searchParams) => {
@@ -84,20 +91,23 @@ export default function Students() {
         <CardHeader>
           <CardTitle>Danh sách sinh viên</CardTitle>
           <CardDescription>
-            Tổng số {listStudent?.data.length} sinh viên,{" "}
+            Tổng số {listStudent?.RawResponse?.Body?.data.length} sinh viên,{" "}
             {
-              listStudent?.data.filter((s) => s.status === UserStatus.Active)
-                .length
+              listStudent?.RawResponse?.Body?.data.filter(
+                (s: { status: UserStatus }) => s.status === UserStatus.Active
+              ).length
             }{" "}
             đang ở,{" "}
             {
-              listStudent?.data.filter((s) => s.status === UserStatus.Inactive)
-                .length
+              listStudent?.RawResponse?.Body?.data.filter(
+                (s: { status: UserStatus }) => s.status === UserStatus.Inactive
+              ).length
             }{" "}
             tạm vắng,{" "}
             {
-              listStudent?.data.filter((s) => s.status === UserStatus.Absent)
-                .length
+              listStudent?.RawResponse?.Body?.data.filter(
+                (s: { status: UserStatus }) => s.status === UserStatus.Absent
+              ).length
             }{" "}
             đã rời đi
           </CardDescription>
@@ -175,8 +185,9 @@ export default function Students() {
                       Đang tải dữ liệu...
                     </TableCell>
                   </TableRow>
-                ) : listStudent?.data && listStudent?.data.length > 0 ? (
-                  listStudent?.data.map((student) => (
+                ) : listStudent?.RawResponse?.Body?.data &&
+                  listStudent?.RawResponse?.Body?.data.length > 0 ? (
+                  listStudent.RawResponse.Body?.data.map((student: IUser) => (
                     <TableRow key={student.id}>
                       <TableCell className="font-medium">
                         {student.student_code}
@@ -243,7 +254,7 @@ export default function Students() {
             {totalPage > 1 && status !== "pending" && (
               <PaginationWithLinks
                 page={+currentPage}
-                totalCount={listStudent?.total ?? 0}
+                totalCount={listStudent?.RawResponse?.Body?.total ?? 0}
                 pageSearchParam="page"
               />
             )}

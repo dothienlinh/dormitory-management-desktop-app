@@ -22,10 +22,10 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { maintenanceHistoriesService } from "@/services/apis/maintenance_histories";
 import { useParams } from "react-router-dom";
 import { toast } from "sonner";
 import { CreateMaintenanceHistories } from "@/interfaces/maintenanceHistory";
+import { CreateMaintenanceHistory } from "wailsjs/go/app/App";
 
 const addMaintenanceSchema = z.object({
   date: z.date({
@@ -51,7 +51,7 @@ export function AddMaintenanceForm({
 
   const { mutateAsync, isPending } = useMutation({
     mutationFn: async (data: CreateMaintenanceHistories) =>
-      maintenanceHistoriesService.create(data),
+      CreateMaintenanceHistory(data),
     onSuccess() {
       setOpenMaintenanceDialog(false);
       queryClient.refetchQueries({
