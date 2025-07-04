@@ -72,10 +72,10 @@ export default function StudentDetails() {
           </Link>
           <div>
             <h2 className="text-3xl font-bold tracking-tight">
-              {student.RawResponse?.Body.data.full_name}
+              {student?.Body.data.full_name}
             </h2>
             <p className="text-muted-foreground">
-              MSSV: {student.RawResponse?.Body.data.student_code}
+              MSSV: {student?.Body.data.student_code}
             </p>
           </div>
         </div>
@@ -88,7 +88,7 @@ export default function StudentDetails() {
       </div>
 
       <div className="grid gap-6 md:grid-cols-6">
-        <StudentProfile student={student.RawResponse?.Body.data} />
+        <StudentProfile student={student?.Body.data} />
 
         <Card className="md:col-span-4">
           <Tabs defaultValue="contracts">

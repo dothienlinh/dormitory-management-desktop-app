@@ -86,21 +86,21 @@ export default function Rooms() {
         <CardHeader>
           <CardTitle>Danh sách phòng</CardTitle>
           <CardDescription>
-            Tổng cộng {listRoom?.RawResponse?.Body?.data.length} phòng,{" "}
+            Tổng cộng {listRoom?.Body?.data.length} phòng,{" "}
             {
-              listRoom?.RawResponse?.Body?.data.filter(
+              listRoom?.Body?.data.filter(
                 (r: { status: string }) => r.status === "occupied"
               ).length
             }{" "}
             đã thuê,{" "}
             {
-              listRoom?.RawResponse?.Body?.data.filter(
+              listRoom?.Body?.data.filter(
                 (r: { status: string }) => r.status === RoomStatus.AVAILABLE
               ).length
             }{" "}
             trống,{" "}
             {
-              listRoom?.RawResponse?.Body?.data.filter(
+              listRoom?.Body?.data.filter(
                 (r: { status: string }) => r.status === "maintenance"
               ).length
             }{" "}
@@ -154,8 +154,8 @@ export default function Rooms() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {listRoom && listRoom.RawResponse?.Body?.data.length > 0 ? (
-                    listRoom.RawResponse?.Body?.data.map(
+                  {listRoom && listRoom?.Body?.data.length > 0 ? (
+                    listRoom?.Body?.data.map(
                       (room: {
                         id: number;
                         room_number: string;

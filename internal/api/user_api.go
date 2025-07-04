@@ -1,22 +1,21 @@
 package api
 
 import (
+	"changeme/internal/client"
 	"fmt"
-
-	"github.com/go-resty/resty/v2"
 )
 
 type UserAPI struct {
-	client *resty.Client
+	client *client.Client
 }
 
-func NewUserAPI(client *resty.Client) *UserAPI {
+func NewUserAPI(client *client.Client) *UserAPI {
 	return &UserAPI{
 		client: client,
 	}
 }
 
-func (u *UserAPI) GetUserDetails(userID string) (*resty.Response, error) {
+func (u *UserAPI) GetUserDetails(userID string) (*client.Response, error) {
 
 	req := u.client.R().
 		SetPathParam("userID", userID)
@@ -34,7 +33,7 @@ func (u *UserAPI) GetUserDetails(userID string) (*resty.Response, error) {
 	return resp, nil
 }
 
-func (u *UserAPI) GetListUsers(page int, keyword *string, order *string, status *string, gender *string) (*resty.Response, error) {
+func (u *UserAPI) GetListUsers(page int, keyword *string, order *string, status *string, gender *string) (*client.Response, error) {
 	req := u.client.R().
 		SetQueryParam("page", fmt.Sprintf("%d", page))
 

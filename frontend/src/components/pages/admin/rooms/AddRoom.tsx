@@ -114,7 +114,7 @@ export default function AddRoom() {
       },
     });
   }
-  const selectedCategory = listRoomCategories?.RawResponse?.Body?.data.find(
+  const selectedCategory = listRoomCategories?.Body?.data.find(
     (item: { id: number }) => item.id === +type
   );
 
@@ -187,7 +187,7 @@ export default function AddRoom() {
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          {listRoomCategories?.RawResponse?.Body?.data?.map(
+                          {listRoomCategories?.Body?.data?.map(
                             (item: {
                               id: Key | null | undefined;
                               name:
@@ -307,8 +307,8 @@ export default function AddRoom() {
               <div>
                 <FormLabel className="mb-2 block">Tiện nghi phòng</FormLabel>
                 <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
-                  {amenities?.RawResponse?.Body?.data &&
-                    amenities?.RawResponse?.Body?.data.map(
+                  {amenities?.Body?.data &&
+                    amenities?.Body?.data.map(
                       (amenity: { id: number; name: string }) => (
                         <FormField
                           key={amenity.id}

@@ -1,20 +1,20 @@
 package api
 
 import (
-	"github.com/go-resty/resty/v2"
+	"changeme/internal/client"
 )
 
 type AuthAPI struct {
-	client *resty.Client
+	client *client.Client
 }
 
-func NewAuthAPI(client *resty.Client) *AuthAPI {
+func NewAuthAPI(client *client.Client) *AuthAPI {
 	return &AuthAPI{
 		client: client,
 	}
 }
 
-func (a *AuthAPI) Login(email, password string) (*resty.Response, error) {
+func (a *AuthAPI) Login(email, password string) (*client.Response, error) {
 	body := map[string]string{
 		"email":    email,
 		"password": password,
@@ -35,7 +35,7 @@ func (a *AuthAPI) Login(email, password string) (*resty.Response, error) {
 	return resp, nil
 }
 
-func (a *AuthAPI) Logout() (*resty.Response, error) {
+func (a *AuthAPI) Logout() (*client.Response, error) {
 	resp, err := a.client.R().
 		Post("/auth/logout")
 
@@ -50,7 +50,7 @@ func (a *AuthAPI) Logout() (*resty.Response, error) {
 	return resp, nil
 }
 
-func (a *AuthAPI) Register(email, password, full_name, phone string) (*resty.Response, error) {
+func (a *AuthAPI) Register(email, password, full_name, phone string) (*client.Response, error) {
 	body := map[string]string{
 		"email":     email,
 		"password":  password,

@@ -107,13 +107,14 @@ export default function AddContracts() {
     isError: isStudentsError,
   } = useInfiniteQuery({
     queryKey: ["students-infinite"],
-    queryFn: ({ pageParam = 1 }) => GetListUsers(pageParam as number),
+    queryFn: ({ pageParam = 1 }) =>
+      GetListUsers(pageParam as number, null, null, null, null),
     initialPageParam: 1,
     getNextPageParam: (lastPage, allPages) => {
-      const hasMore = lastPage.RawResponse?.Body?.data.length >= 10;
+      const hasMore = lastPage?.Body?.data.length >= 10;
       const nextPage = hasMore ? allPages.length + 1 : undefined;
       console.log(`📄 Students getNextPageParam:`, {
-        currentItems: lastPage.RawResponse?.Body?.data.length,
+        currentItems: lastPage?.Body?.data.length,
         totalPages: allPages.length,
         nextPage,
       });
@@ -135,10 +136,10 @@ export default function AddContracts() {
     queryFn: ({ pageParam = 1 }) => GetListRooms(pageParam as number),
     initialPageParam: 1,
     getNextPageParam: (lastPage, allPages) => {
-      const hasMore = lastPage.RawResponse?.Body?.data.length >= 10;
+      const hasMore = lastPage?.Body?.data.length >= 10;
       const nextPage = hasMore ? allPages.length + 1 : undefined;
       console.log(`📄 Rooms getNextPageParam:`, {
-        currentItems: lastPage.RawResponse?.Body?.data.length,
+        currentItems: lastPage?.Body?.data.length,
         totalPages: allPages.length,
         nextPage,
       });
@@ -166,14 +167,12 @@ export default function AddContracts() {
   });
 
   const allStudents = useMemo(
-    () =>
-      studentsData?.pages.flatMap((page) => page.RawResponse?.Body?.data) ?? [],
+    () => studentsData?.pages.flatMap((page) => page?.Body?.data) ?? [],
     [studentsData]
   );
 
   const allRooms = useMemo(
-    () =>
-      roomsData?.pages.flatMap((page) => page.RawResponse?.Body?.data) ?? [],
+    () => roomsData?.pages.flatMap((page) => page?.Body?.data) ?? [],
     [roomsData]
   );
 

@@ -47,15 +47,13 @@ export default function EditRoom() {
     );
   }
 
-  if (!room?.RawResponse?.Body?.data) {
+  if (!room?.Body?.data) {
     return (
       <div className="max-w-4xl mx-auto my-6">
         <Alert variant="destructive">
           <AlertCircle className="h-4 w-4" />
           <AlertTitle>Lỗi</AlertTitle>
-          <AlertDescription>
-            {room?.RawResponse?.Body?.message}
-          </AlertDescription>
+          <AlertDescription>{room?.Body?.message}</AlertDescription>
         </Alert>
         <div className="mt-4">
           <Button onClick={() => navigate("/admin/rooms")}>
@@ -79,7 +77,7 @@ export default function EditRoom() {
         <div>
           <h2 className="text-3xl font-bold tracking-tight">Chỉnh sửa phòng</h2>
           <p className="text-muted-foreground">
-            Cập nhật thông tin phòng {room?.RawResponse?.Body?.data.room_number}
+            Cập nhật thông tin phòng {room?.Body?.data.room_number}
           </p>
         </div>
       </div>
@@ -92,16 +90,14 @@ export default function EditRoom() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          {room?.RawResponse?.Body?.data &&
-            amenities?.RawResponse?.Body?.data &&
-            listRoomCategories?.RawResponse?.Body?.data && (
+          {room?.Body?.data &&
+            amenities?.Body?.data &&
+            listRoomCategories?.Body?.data && (
               <EditRoomForm
-                amenities={amenities?.RawResponse?.Body?.data || []}
-                listRoomCategories={
-                  listRoomCategories?.RawResponse?.Body?.data || []
-                }
+                amenities={amenities?.Body?.data || []}
+                listRoomCategories={listRoomCategories?.Body?.data || []}
                 id={id ? +id : 0}
-                room={room.RawResponse.Body.data}
+                room={room.Body.data}
               />
             )}
         </CardContent>
