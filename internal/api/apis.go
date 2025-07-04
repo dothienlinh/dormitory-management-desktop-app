@@ -1,6 +1,6 @@
 package api
 
-import "github.com/go-resty/resty/v2"
+import "changeme/internal/client"
 
 type Response struct {
 	Success bool          `json:"success"`
@@ -18,7 +18,7 @@ type API struct {
 	maintenanceHistoryAPI *MaintenanceHistoryAPI
 }
 
-func NewAPI(client *resty.Client) *API {
+func NewAPI(client *client.Client) *API {
 	return &API{
 		apiAuth:               NewAuthAPI(client),
 		userAPI:               NewUserAPI(client),

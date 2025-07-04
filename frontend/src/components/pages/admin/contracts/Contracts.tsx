@@ -65,9 +65,7 @@ export default function Contracts() {
     },
   });
 
-  const totalPage = data?.RawResponse?.Body?.total
-    ? Math.ceil(data.RawResponse.Body.total / 10)
-    : 0;
+  const totalPage = data?.Body?.total ? Math.ceil(data.Body.total / 10) : 0;
 
   const handleResetPage = () => {
     setSearchParams((searchParams) => {
@@ -103,23 +101,23 @@ export default function Contracts() {
         <CardHeader>
           <CardTitle>Danh sách hợp đồng</CardTitle>
           <CardDescription>
-            Tổng số {data?.RawResponse?.Body?.data.length} hợp đồng,{" "}
+            Tổng số {data?.Body?.data.length} hợp đồng,{" "}
             {
-              data?.RawResponse?.Body?.data.filter(
+              data?.Body?.data.filter(
                 (c: { status: ContractStatus }) =>
                   c.status === ContractStatus.ACTIVE
               ).length
             }{" "}
             đang hiệu lực,{" "}
             {
-              data?.RawResponse?.Body?.data.filter(
+              data?.Body?.data.filter(
                 (c: { status: ContractStatus }) =>
                   c.status === ContractStatus.INACTIVE
               ).length
             }{" "}
             đã hết hạn,{" "}
             {
-              data?.RawResponse?.Body?.data.filter(
+              data?.Body?.data.filter(
                 (c: { status: ContractStatus }) =>
                   c.status === ContractStatus.CANCELLED
               ).length
@@ -182,9 +180,8 @@ export default function Contracts() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {data?.RawResponse?.Body?.data &&
-                data?.RawResponse?.Body?.data.length > 0 ? (
-                  data.RawResponse.Body.data.map(
+                {data?.Body?.data && data?.Body?.data.length > 0 ? (
+                  data.Body.data.map(
                     (contract: {
                       id: Key | null | undefined;
                       code:
@@ -382,7 +379,7 @@ export default function Contracts() {
             {totalPage > 1 && status !== "pending" && (
               <PaginationWithLinks
                 page={+currentPage}
-                totalCount={data?.RawResponse?.Body?.total ?? 0}
+                totalCount={data?.Body?.total ?? 0}
                 pageSearchParam="page"
               />
             )}

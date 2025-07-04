@@ -53,7 +53,7 @@ export default function Amenities() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <AmenitiesList amenities={amenities?.RawResponse?.Body.data} />
+          <AmenitiesList amenities={amenities?.Body.data} />
         </CardContent>
       </Card>
 

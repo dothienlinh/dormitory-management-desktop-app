@@ -38,10 +38,8 @@ export default function LoginComponent() {
   const { mutateAsync, isPending } = useMutation({
     mutationFn: (data: LoginFormValues) => Login(data.email, data.password),
     onSuccess: (data) => {
-      dispatch(setUser(data.RawResponse?.Body.data.user));
-      navigate(
-        MAP_ROLE_TO_PATH[data.RawResponse?.Body.data.user.role as UserRole]
-      );
+      dispatch(setUser(data?.Body.data.user));
+      navigate(MAP_ROLE_TO_PATH[data?.Body.data.user.role as UserRole]);
     },
   });
 

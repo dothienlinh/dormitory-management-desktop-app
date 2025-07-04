@@ -75,25 +75,21 @@ function ProtectedRoutes() {
   );
   const navigate = useNavigate();
 
-  const handleRedirect = () => {
-    if (user) {
-      return MAP_ROLE_TO_PATH[user.role];
-    }
-
-    if (PUBLIC_ROUTES.includes(window.location.pathname)) {
-      return window.location.pathname;
-    }
-
-    return "/auth/login";
-  };
-
   useEffect(() => {
-    if (!isAuthenticated) {
-      navigate(handleRedirect());
+    const currentPath = window.location.pathname;
+
+    // Nếu user đã authenticated và đang ở trang public, redirect về dashboard
+    if (isAuthenticated && user && PUBLIC_ROUTES.includes(currentPath)) {
+      navigate(MAP_ROLE_TO_PATH[user.role], { replace: true });
+      return;
     }
 
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isAuthenticated, handleRedirect]);
+    // Nếu user chưa authenticated và không ở trang public, redirect về login
+    if (!isAuthenticated && !PUBLIC_ROUTES.includes(currentPath)) {
+      navigate("/auth/login", { replace: true });
+      return;
+    }
+  }, [isAuthenticated, user, navigate]);
 
   return (
     <Suspense
@@ -104,7 +100,19 @@ function ProtectedRoutes() {
       }
     >
       <Routes>
-        <Route index element={<Navigate to={handleRedirect()} replace />} />
+        <Route
+          index
+          element={
+            <Navigate
+              to={
+                isAuthenticated && user
+                  ? MAP_ROLE_TO_PATH[user.role]
+                  : "/auth/login"
+              }
+              replace
+            />
+          }
+        />
 
         <Route path="auth" element={<AuthLayout />}>
           <Route path="login" element={<Login />} />

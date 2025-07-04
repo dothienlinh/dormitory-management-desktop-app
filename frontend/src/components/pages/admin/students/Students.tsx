@@ -63,8 +63,8 @@ export default function Students() {
       );
     },
   });
-  const totalPage = listStudent?.RawResponse?.Body?.total
-    ? Math.ceil(listStudent.RawResponse.Body.total / 10)
+  const totalPage = listStudent?.Body?.total
+    ? Math.ceil(listStudent.Body.total / 10)
     : 0;
 
   const handleResetPage = () => {
@@ -91,21 +91,21 @@ export default function Students() {
         <CardHeader>
           <CardTitle>Danh sách sinh viên</CardTitle>
           <CardDescription>
-            Tổng số {listStudent?.RawResponse?.Body?.data.length} sinh viên,{" "}
+            Tổng số {listStudent?.Body?.data.length} sinh viên,{" "}
             {
-              listStudent?.RawResponse?.Body?.data.filter(
+              listStudent?.Body?.data.filter(
                 (s: { status: UserStatus }) => s.status === UserStatus.Active
               ).length
             }{" "}
             đang ở,{" "}
             {
-              listStudent?.RawResponse?.Body?.data.filter(
+              listStudent?.Body?.data.filter(
                 (s: { status: UserStatus }) => s.status === UserStatus.Inactive
               ).length
             }{" "}
             tạm vắng,{" "}
             {
-              listStudent?.RawResponse?.Body?.data.filter(
+              listStudent?.Body?.data.filter(
                 (s: { status: UserStatus }) => s.status === UserStatus.Absent
               ).length
             }{" "}
@@ -185,9 +185,9 @@ export default function Students() {
                       Đang tải dữ liệu...
                     </TableCell>
                   </TableRow>
-                ) : listStudent?.RawResponse?.Body?.data &&
-                  listStudent?.RawResponse?.Body?.data.length > 0 ? (
-                  listStudent.RawResponse.Body?.data.map((student: IUser) => (
+                ) : listStudent?.Body?.data &&
+                  listStudent?.Body?.data.length > 0 ? (
+                  listStudent.Body?.data.map((student: IUser) => (
                     <TableRow key={student.id}>
                       <TableCell className="font-medium">
                         {student.student_code}
@@ -254,7 +254,7 @@ export default function Students() {
             {totalPage > 1 && status !== "pending" && (
               <PaginationWithLinks
                 page={+currentPage}
-                totalCount={listStudent?.RawResponse?.Body?.total ?? 0}
+                totalCount={listStudent?.Body?.total ?? 0}
                 pageSearchParam="page"
               />
             )}

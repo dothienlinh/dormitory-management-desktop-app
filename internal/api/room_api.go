@@ -1,46 +1,45 @@
 package api
 
 import (
+	"changeme/internal/client"
 	"fmt"
-
-	"github.com/go-resty/resty/v2"
 )
 
 type RoomAPI struct {
-	client *resty.Client
+	client *client.Client
 }
 
-func NewRoomAPI(client *resty.Client) *RoomAPI {
+func NewRoomAPI(client *client.Client) *RoomAPI {
 	return &RoomAPI{
 		client: client,
 	}
 }
 
-func (r *RoomAPI) GetRoomDetails(roomID int) (*resty.Response, error) {
+func (r *RoomAPI) GetRoomDetails(roomID int) (*client.Response, error) {
 	return r.client.R().
 		SetPathParam("id", fmt.Sprintf("%d", roomID)).
 		Get("/rooms/{id}")
 }
 
-func (r *RoomAPI) GetListRooms(page int) (*resty.Response, error) {
+func (r *RoomAPI) GetListRooms(page int) (*client.Response, error) {
 	return r.client.R().
 		SetQueryParam("page", fmt.Sprintf("%d", page)).
 		Get("/rooms")
 }
 
-func (r *RoomAPI) CreateRoom(roomData map[string]interface{}) (*resty.Response, error) {
+func (r *RoomAPI) CreateRoom(roomData map[string]interface{}) (*client.Response, error) {
 	return r.client.R().
 		SetBody(roomData).
 		Post("/rooms")
 }
 
-func (r *RoomAPI) DeleteRoom(roomID int) (*resty.Response, error) {
+func (r *RoomAPI) DeleteRoom(roomID int) (*client.Response, error) {
 	return r.client.R().
 		SetPathParam("id", fmt.Sprintf("%d", roomID)).
 		Delete("/rooms/{id}")
 }
 
-func (r *RoomAPI) UpdateRoom(roomID int, roomData map[string]interface{}) (*resty.Response, error) {
+func (r *RoomAPI) UpdateRoom(roomID int, roomData map[string]interface{}) (*client.Response, error) {
 	return r.client.R().
 		SetPathParam("id", fmt.Sprintf("%d", roomID)).
 		SetBody(roomData).
