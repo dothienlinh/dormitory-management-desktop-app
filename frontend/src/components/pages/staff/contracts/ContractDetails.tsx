@@ -237,7 +237,7 @@ export default function ContractDetails() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <Link to="/admin/contracts">
+            <Link to="/staff/contracts">
               <Button>
                 <ChevronLeft className="mr-2 h-4 w-4" />
                 Quay lại danh sách hợp đồng
@@ -253,7 +253,7 @@ export default function ContractDetails() {
     <div className="space-y-6">
       <div className="flex flex-col justify-between space-y-4 md:flex-row md:items-center md:space-y-0">
         <div className="flex items-center space-x-4">
-          <Link to="/admin/contracts">
+          <Link to="/staff/contracts">
             <Button variant="outline" size="icon">
               <ChevronLeft className="h-4 w-4" />
             </Button>
@@ -305,7 +305,7 @@ export default function ContractDetails() {
               <div className="flex items-center justify-between">
                 <span className="text-sm text-muted-foreground">Họ tên:</span>
                 <Link
-                  to={`/admin/students/${contract.studentId}`}
+                  to={`/staff/students/${contract.studentId}`}
                   className="font-medium text-blue-600 hover:underline"
                 >
                   {contract.studentName}
@@ -347,7 +347,7 @@ export default function ContractDetails() {
               <div className="flex items-center justify-between">
                 <span className="text-sm text-muted-foreground">Mã phòng:</span>
                 <Link
-                  to={`/admin/rooms/${contract.roomId}`}
+                  to={`/staff/rooms/${contract.roomId}`}
                   className="font-medium text-blue-600 hover:underline"
                 >
                   {contract.roomName}

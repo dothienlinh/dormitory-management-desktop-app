@@ -87,7 +87,7 @@ export default function AddRoom() {
         amenity_ids: data.amenities || [],
       }),
     onSuccess: () => {
-      navigate("/admin/rooms");
+      navigate("/staff/rooms");
     },
     // onError: (error) => {},
   });
@@ -134,7 +134,7 @@ export default function AddRoom() {
         <Button
           variant="ghost"
           size="icon"
-          onClick={() => navigate("/admin/rooms")}
+          onClick={() => navigate("/staff/rooms")}
         >
           <ChevronLeft className="h-5 w-5" />
         </Button>
@@ -354,7 +354,7 @@ export default function AddRoom() {
                 <Button
                   type="button"
                   variant="outline"
-                  onClick={() => navigate("/admin/rooms")}
+                  onClick={() => navigate("/staff/rooms")}
                 >
                   Hủy
                 </Button>

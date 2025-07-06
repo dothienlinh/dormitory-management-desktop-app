@@ -61,7 +61,7 @@ export function OccupantsTable({
                   {/* {new Date(student.contractEnd).toLocaleDateString("vi-VN")} */}
                 </TableCell>
                 <TableCell>
-                  <Link to={`/admin/students/${student.id}`}>
+                  <Link to={`/staff/students/${student.id}`}>
                     <Button variant="link" size="sm">
                       Xem chi tiết
                     </Button>

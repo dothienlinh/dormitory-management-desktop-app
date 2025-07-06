@@ -137,7 +137,7 @@ export function StudentProfile({ student }: StudentProfileProps) {
               <div>
                 <p className="text-muted-foreground">Phòng hiện tại</p>
                 <Link
-                  to={`/admin/rooms/${student.room?.id}`}
+                  to={`/staff/rooms/${student.room?.id}`}
                   className="text-blue-600 hover:underline"
                 >
                   {student.room?.room_number}

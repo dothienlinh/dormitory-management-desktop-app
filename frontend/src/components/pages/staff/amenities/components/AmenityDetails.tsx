@@ -104,7 +104,7 @@ export default function AmenityDetails() {
     // Simulate API call
     setTimeout(() => {
       // Navigate back to list after successful deletion
-      navigate("/admin/amenities");
+      navigate("/staff/amenities");
     }, 500);
   };
 
@@ -117,7 +117,7 @@ export default function AmenityDetails() {
               <Button
                 variant="ghost"
                 size="icon"
-                onClick={() => navigate("/admin/amenities")}
+                onClick={() => navigate("/staff/amenities")}
               >
                 <ArrowLeft className="h-4 w-4" />
               </Button>

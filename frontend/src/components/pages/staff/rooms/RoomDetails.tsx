@@ -39,7 +39,7 @@ export default function RoomDetails() {
   };
 
   const handleEditRoom = () => {
-    navigate(`/admin/rooms/edit/${id}`);
+    navigate(`/staff/rooms/edit/${id}`);
   };
 
   if (isLoading) {

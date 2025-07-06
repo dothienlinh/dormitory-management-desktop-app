@@ -240,7 +240,7 @@ export default function AddContracts() {
         <Button
           variant="outline"
           size="icon"
-          onClick={() => navigate("/admin/contracts")}
+          onClick={() => navigate("/staff/contracts")}
         >
           <ChevronLeft className="h-4 w-4" />
         </Button>
@@ -692,7 +692,7 @@ export default function AddContracts() {
             <Button
               type="button"
               variant="outline"
-              onClick={() => navigate("/admin/contracts")}
+              onClick={() => navigate("/staff/contracts")}
             >
               Hủy
             </Button>

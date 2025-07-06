@@ -81,7 +81,7 @@ export default function EditRoomForm({
         amenity_ids: data.amenities ?? [],
       }),
     onSuccess: () => {
-      navigate("/admin/rooms");
+      navigate("/staff/rooms");
     },
     // onError: (error) => {},
   });
@@ -281,7 +281,7 @@ export default function EditRoomForm({
           <Button
             type="button"
             variant="outline"
-            onClick={() => navigate("/admin/rooms")}
+            onClick={() => navigate("/staff/rooms")}
           >
             Hủy
           </Button>

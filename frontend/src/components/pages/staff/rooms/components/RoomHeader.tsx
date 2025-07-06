@@ -28,7 +28,7 @@ export function RoomHeader({ room, onEdit, id }: RoomHeaderProps) {
   const { mutateAsync, isPending } = useMutation({
     mutationFn: () => DeleteRoom(id),
     onSuccess: () => {
-      navigate("/admin/rooms");
+      navigate("/staff/rooms");
     },
     // onError: (error) => {},
   });
@@ -47,7 +47,7 @@ export function RoomHeader({ room, onEdit, id }: RoomHeaderProps) {
   return (
     <div className="flex items-center justify-between">
       <div className="flex items-center space-x-4">
-        <Link to="/admin/rooms">
+        <Link to="/staff/rooms">
           <Button variant="outline" size="icon">
             <ChevronLeft className="h-4 w-4" />
           </Button>

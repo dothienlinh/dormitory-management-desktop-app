@@ -265,7 +265,7 @@ export default function ServiceRequestList({
                       <div className="flex items-center space-x-2">
                         <Button variant="ghost" size="icon">
                           <Link
-                            to={`/admin/services/requests/${request.id}`}
+                            to={`/staff/services/requests/${request.id}`}
                             className="flex items-center justify-center"
                           >
                             <Eye className="h-4 w-4" />

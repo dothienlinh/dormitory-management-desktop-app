@@ -56,7 +56,7 @@ export default function EditRoom() {
           <AlertDescription>{room?.ParsedBody?.message}</AlertDescription>
         </Alert>
         <div className="mt-4">
-          <Button onClick={() => navigate("/admin/rooms")}>
+          <Button onClick={() => navigate("/staff/rooms")}>
             Quay lại danh sách phòng
           </Button>
         </div>
@@ -70,7 +70,7 @@ export default function EditRoom() {
         <Button
           variant="ghost"
           size="icon"
-          onClick={() => navigate(`/admin/rooms/${id}`)}
+          onClick={() => navigate(`/staff/rooms/${id}`)}
         >
           <ChevronLeft className="h-5 w-5" />
         </Button>

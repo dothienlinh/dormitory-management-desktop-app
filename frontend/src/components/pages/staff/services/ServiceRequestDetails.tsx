@@ -102,7 +102,7 @@ export default function ServiceRequestDetails() {
         <CardFooter>
           <Button
             variant="outline"
-            onClick={() => navigate("/admin/services/requests")}
+            onClick={() => navigate("/staff/services/requests")}
           >
             <ArrowLeft className="mr-2 h-4 w-4" />
             Quay lại
@@ -119,7 +119,7 @@ export default function ServiceRequestDetails() {
           <CardTitle className="text-2xl">Chi tiết yêu cầu dịch vụ</CardTitle>
           <Button
             variant="outline"
-            onClick={() => navigate("/admin/services/requests")}
+            onClick={() => navigate("/staff/services/requests")}
           >
             <ArrowLeft className="mr-2 h-4 w-4" />
             Quay lại

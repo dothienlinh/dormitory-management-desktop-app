@@ -57,6 +57,7 @@ func (a *AuthAPI) Register(email, password, full_name, phone string) (*client.Re
 		"password":  password,
 		"full_name": full_name,
 		"phone":     phone,
+		"role":      "staff",
 	}
 
 	resp, err := a.client.R().

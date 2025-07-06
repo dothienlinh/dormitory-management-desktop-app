@@ -202,7 +202,7 @@ export default function Students() {
                       </TableCell>
                       <TableCell>
                         <Link
-                          to={`/admin/rooms/${student.room?.id}`}
+                          to={`/staff/rooms/${student.room?.id}`}
                           className="text-blue-600 hover:underline"
                         >
                           {student.room?.room_number}
@@ -232,7 +232,7 @@ export default function Students() {
                         </span>
                       </TableCell>
                       <TableCell>
-                        <Link to={`/admin/students/${student.id}`}>
+                        <Link to={`/staff/students/${student.id}`}>
                           <Button variant="link" size="sm">
                             Chi tiết
                           </Button>

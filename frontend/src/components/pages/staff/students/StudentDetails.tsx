@@ -49,7 +49,7 @@ export default function StudentDetails() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <Link to="/admin/students">
+            <Link to="/staff/students">
               <Button>
                 <ChevronLeft className="mr-2 h-4 w-4" />
                 Quay lại danh sách sinh viên
@@ -65,7 +65,7 @@ export default function StudentDetails() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-4">
-          <Link to="/admin/students">
+          <Link to="/staff/students">
             <Button variant="outline" size="icon">
               <ChevronLeft className="h-4 w-4" />
             </Button>

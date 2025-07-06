@@ -81,7 +81,7 @@ export default function Contracts() {
           </p>
         </div>
         <div className="flex space-x-2">
-          <Button onClick={() => navigate("/admin/contracts/add")}>
+          <Button onClick={() => navigate("/staff/contracts/add")}>
             <PlusCircle className="mr-2 h-4 w-4" />
             Tạo hợp đồng mới
           </Button>
@@ -183,7 +183,7 @@ export default function Contracts() {
                       </TableCell>
                       <TableCell>
                         <Link
-                          to={`/admin/students/${contract.user_id}`}
+                          to={`/staff/students/${contract.user_id}`}
                           className="text-blue-600 hover:underline"
                         >
                           {contract.user.full_name}
@@ -191,7 +191,7 @@ export default function Contracts() {
                       </TableCell>
                       <TableCell>
                         <Link
-                          to={`/admin/rooms/${contract.room.id}`}
+                          to={`/staff/rooms/${contract.room.id}`}
                           className="text-blue-600 hover:underline"
                         >
                           {contract.room.room_number}
@@ -228,7 +228,7 @@ export default function Contracts() {
                         )}
                       </TableCell>
                       <TableCell>
-                        <Link to={`/admin/contracts/${contract.id}`}>
+                        <Link to={`/staff/contracts/${contract.id}`}>
                           <Button variant="link" size="sm">
                             Chi tiết
                           </Button>

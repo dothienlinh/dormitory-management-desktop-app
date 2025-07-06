@@ -29,7 +29,7 @@ export default function ServiceDetails() {
           </CardDescription>
         </CardHeader>
         <CardFooter>
-          <Button variant="outline" onClick={() => navigate("/admin/services")}>
+          <Button variant="outline" onClick={() => navigate("/staff/services")}>
             <ArrowLeft className="mr-2 h-4 w-4" />
             Quay lại
           </Button>
@@ -43,7 +43,7 @@ export default function ServiceDetails() {
       <CardHeader className="space-y-1">
         <div className="flex items-center justify-between">
           <CardTitle className="text-2xl">Chi tiết dịch vụ</CardTitle>
-          <Button variant="outline" onClick={() => navigate("/admin/services")}>
+          <Button variant="outline" onClick={() => navigate("/staff/services")}>
             <ArrowLeft className="mr-2 h-4 w-4" />
             Quay lại
           </Button>
@@ -98,7 +98,7 @@ export default function ServiceDetails() {
         </Table>
       </CardContent>
       <CardFooter className="flex justify-end space-x-2">
-        <Button onClick={() => navigate(`/admin/services/edit/${service.id}`)}>
+        <Button onClick={() => navigate(`/staff/services/edit/${service.id}`)}>
           <Pencil className="mr-2 h-4 w-4" />
           Chỉnh sửa
         </Button>

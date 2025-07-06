@@ -67,7 +67,7 @@ export default function ServiceList({ services }: ServiceListProps) {
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => navigate(`/admin/services/${service.id}`)}
+                  onClick={() => navigate(`/staff/services/${service.id}`)}
                 >
                   Chi tiết
                 </Button>

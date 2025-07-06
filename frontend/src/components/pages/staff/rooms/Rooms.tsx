@@ -76,7 +76,7 @@ export default function Rooms() {
             Quản lý thông tin tất cả các phòng trong ký túc xá
           </p>
         </div>
-        <Button onClick={() => navigate("/admin/rooms/add")}>
+        <Button onClick={() => navigate("/staff/rooms/add")}>
           <PlusCircle className="mr-2 h-4 w-4" />
           Thêm phòng mới
         </Button>
@@ -186,7 +186,7 @@ export default function Rooms() {
                             {room.room_category?.price.toLocaleString() ?? 0}
                           </TableCell>
                           <TableCell>
-                            <Link to={`/admin/rooms/${room.id}`}>
+                            <Link to={`/staff/rooms/${room.id}`}>
                               <Button variant="link" size="sm">
                                 Chi tiết
                               </Button>
