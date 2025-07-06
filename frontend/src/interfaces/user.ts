@@ -1,6 +1,7 @@
-import { Gender, OrderBy, UserRole, UserStatus } from "@/enums";
+import { Gender, UserRole, UserStatus } from "@/enums/user";
 import { Room } from "./room";
 import { Pagination } from "./service";
+import { OrderBy } from "@/enums";
 
 export interface User {
   id: number;

@@ -19,8 +19,8 @@ import { useMutation } from "@tanstack/react-query";
 import { MAP_ROLE_TO_PATH } from "@/components/routers/constants";
 import { PasswordInput } from "@/components/ui/password-input";
 import { toast } from "sonner";
-import { Login } from "wailsjs/go/app/App";
-import { UserRole } from "@/enums";
+import { Login, SetToken } from "wailsjs/go/app/App";
+import { UserRole } from "@/enums/user";
 
 const loginFormSchema = z.object({
   email: z.string().min(1, { message: "Email không được để trống" }).email({
@@ -38,8 +38,29 @@ export default function LoginComponent() {
   const { mutateAsync, isPending } = useMutation({
     mutationFn: (data: LoginFormValues) => Login(data.email, data.password),
     onSuccess: (data) => {
-      dispatch(setUser(data?.Body.data.user));
-      navigate(MAP_ROLE_TO_PATH[data?.Body.data.user.role as UserRole]);
+      console.log("Login success data:", data);
+      console.log("ParsedBody:", data?.ParsedBody);
+
+      if (data?.ParsedBody?.data?.user) {
+        dispatch(setUser(data.ParsedBody.data.user));
+        const userRole = data.ParsedBody.data.user.role as UserRole;
+        SetToken(data?.ParsedBody?.data?.access_token || "");
+        const redirectPath = MAP_ROLE_TO_PATH[userRole];
+        console.log("User role:", userRole, "Redirect path:", redirectPath);
+
+        if (redirectPath) {
+          navigate(redirectPath);
+        } else {
+          console.error("No redirect path found for role:", userRole);
+          toast.error("Không thể xác định quyền hạn của người dùng");
+        }
+      } else {
+        console.error("Invalid response structure:", data);
+        toast.error("Dữ liệu phản hồi không hợp lệ");
+      }
+    },
+    onError: (error) => {
+      console.error("Login error:", error);
     },
   });
 

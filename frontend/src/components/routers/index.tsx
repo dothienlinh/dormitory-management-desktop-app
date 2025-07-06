@@ -23,50 +23,55 @@ const ResetPassword = lazy(
 );
 
 const DashboardLayout = lazy(() => import("@/components/layout/admin"));
-const Dashboard = lazy(() => import("@/components/pages/admin/Dashboard"));
-const Rooms = lazy(() => import("@/components/pages/admin/rooms/Rooms"));
+const Dashboard = lazy(() => import("@/components/pages/staff/Dashboard"));
+const Rooms = lazy(() => import("@/components/pages/staff/rooms/Rooms"));
 const RoomDetails = lazy(
-  () => import("@/components/pages/admin/rooms/RoomDetails")
+  () => import("@/components/pages/staff/rooms/RoomDetails")
 );
-const AddRoom = lazy(() => import("@/components/pages/admin/rooms/AddRoom"));
-const EditRoom = lazy(() => import("@/components/pages/admin/rooms/EditRoom"));
+const AddRoom = lazy(() => import("@/components/pages/staff/rooms/AddRoom"));
+const EditRoom = lazy(() => import("@/components/pages/staff/rooms/EditRoom"));
 const Students = lazy(
-  () => import("@/components/pages/admin/students/Students")
+  () => import("@/components/pages/staff/students/Students")
 );
 const StudentDetails = lazy(
-  () => import("@/components/pages/admin/students/StudentDetails")
+  () => import("@/components/pages/staff/students/StudentDetails")
 );
 const Contracts = lazy(
-  () => import("@/components/pages/admin/contracts/Contracts")
+  () => import("@/components/pages/staff/contracts/Contracts")
 );
 const AddContracts = lazy(
-  () => import("@/components/pages/admin/contracts/AddContracts")
+  () => import("@/components/pages/staff/contracts/AddContracts")
 );
 const ContractDetails = lazy(
-  () => import("@/components/pages/admin/contracts/ContractDetails")
+  () => import("@/components/pages/staff/contracts/ContractDetails")
 );
 const Finance = lazy(() => import("@/components/pages/admin/finance/Finance"));
 const Invoices = lazy(
   () => import("@/components/pages/admin/finance/Invoices")
 );
 const Services = lazy(
-  () => import("@/components/pages/admin/services/Services")
+  () => import("@/components/pages/staff/services/Services")
 );
 const ServiceDetails = lazy(
-  () => import("@/components/pages/admin/services/ServiceDetails")
+  () => import("@/components/pages/staff/services/ServiceDetails")
 );
 const ServiceRequestDetails = lazy(
-  () => import("@/components/pages/admin/services/ServiceRequestDetails")
+  () => import("@/components/pages/staff/services/ServiceRequestDetails")
 );
 const Security = lazy(
-  () => import("@/components/pages/admin/security/Security")
+  () => import("@/components/pages/staff/security/Security")
 );
 const Amenities = lazy(
-  () => import("@/components/pages/admin/amenities/Amenities")
+  () => import("@/components/pages/staff/amenities/Amenities")
 );
 // const AmenityDetails = lazy(
 //   () => import("@/components/pages/admin/amenities/components/AmenityDetails")
 // );
+
+const Users = lazy(() => import("@/components/pages/admin/users/Users"));
+const UserDetail = lazy(
+  () => import("@/components/pages/admin/users/UserDetail")
+);
 
 // Wrap all routes with this component that handles auth
 function ProtectedRoutes() {
@@ -124,6 +129,14 @@ function ProtectedRoutes() {
         <Route path="admin" element={<DashboardLayout />}>
           <Route index element={<Dashboard />} />
 
+          <Route path="finance" element={<Finance />} />
+          <Route path="finance/invoices" element={<Invoices />} />
+
+          <Route path="users" element={<Users />} />
+          <Route path="users/:id" element={<UserDetail />} />
+        </Route>
+
+        <Route path="staff" element={<DashboardLayout />}>
           <Route path="rooms" element={<Rooms />} />
           <Route path="rooms/add" element={<AddRoom />} />
           <Route path="rooms/edit/:id" element={<EditRoom />} />
@@ -135,9 +148,6 @@ function ProtectedRoutes() {
           <Route path="contracts" element={<Contracts />} />
           <Route path="contracts/:id" element={<ContractDetails />} />
           <Route path="contracts/add" element={<AddContracts />} />
-
-          <Route path="finance" element={<Finance />} />
-          <Route path="finance/invoices" element={<Invoices />} />
 
           <Route path="services" element={<Services />} />
           <Route path="services/:id" element={<ServiceDetails />} />

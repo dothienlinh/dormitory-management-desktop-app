@@ -42,11 +42,15 @@ export function GetRoomDetails(arg1:number):Promise<client.Response>;
 
 export function GetUserDetails(arg1:string):Promise<client.Response>;
 
+export function LogData(arg1:any,arg2:Array<any>):Promise<void>;
+
 export function Login(arg1:string,arg2:string):Promise<client.Response>;
 
 export function Logout():Promise<client.Response>;
 
 export function Register(arg1:string,arg2:string,arg3:string,arg4:string):Promise<client.Response>;
+
+export function SetToken(arg1:string):Promise<void>;
 
 export function UpdateAmenity(arg1:string,arg2:Record<string, any>):Promise<client.Response>;
 

@@ -4,16 +4,20 @@ import (
 	"changeme/internal/api"
 	"changeme/internal/client"
 	"context"
+	"errors"
+	"log"
 )
 
 type App struct {
-	ctx context.Context
-	api *api.API
+	ctx        context.Context
+	api        *api.API
+	httpClient *client.Client
 }
 
 func NewApp(httpClient *client.Client) *App {
 	return &App{
-		api: api.NewAPI(httpClient),
+		api:        api.NewAPI(httpClient),
+		httpClient: httpClient,
 	}
 }
 
@@ -21,12 +25,34 @@ func (a *App) Startup(ctx context.Context) {
 	a.ctx = ctx
 }
 
+func (a *App) LogData(messages *string, data ...interface{}) {
+	log.Println(messages, data)
+}
+
+func (a *App) SetToken(token string) error {
+	if a.ctx == nil {
+		return context.Canceled
+	}
+
+	if a.httpClient != nil {
+		a.httpClient.SetHeader("Authorization", "Bearer "+token)
+		return nil
+	}
+
+	return errors.New("HTTP client is not initialized")
+}
+
 func (a *App) Login(email, password string) (*client.Response, error) {
 	if a.ctx == nil {
 		return nil, context.Canceled
 	}
 
-	return a.api.Auth().Login(email, password)
+	result, err := a.api.Auth().Login(email, password)
+	if err != nil {
+		return nil, err
+	}
+
+	return result, nil
 }
 
 func (a *App) Logout() (*client.Response, error) {

@@ -13,12 +13,24 @@ import (
 
 // Response wraps the standard http.Response with additional functionality to mimic resty.Response
 type Response struct {
-	*http.Response
-	body []byte
+	Status           string              `json:"Status"`
+	StatusCode       int                 `json:"StatusCode"`
+	Proto            string              `json:"Proto"`
+	ProtoMajor       int                 `json:"ProtoMajor"`
+	ProtoMinor       int                 `json:"ProtoMinor"`
+	Header           map[string][]string `json:"Header"`
+	ContentLength    int64               `json:"ContentLength"`
+	TransferEncoding []string            `json:"TransferEncoding"`
+	Close            bool                `json:"Close"`
+	Uncompressed     bool                `json:"Uncompressed"`
+	Trailer          map[string][]string `json:"Trailer"`
+
+	body       []byte
+	ParsedBody interface{} `json:"ParsedBody"` // Parsed JSON body for JavaScript consumption
 }
 
-// Body returns the response body as bytes
-func (r *Response) Body() []byte {
+// RawBody returns the response body as bytes
+func (r *Response) RawBody() []byte {
 	return r.body
 }
 
@@ -104,27 +116,27 @@ func (r *RequestBuilder) SetPathParam(key, value string) *RequestBuilder {
 
 // Get executes a GET request
 func (r *RequestBuilder) Get(url string) (*Response, error) {
-	return r.client.doRequest("GET", url, r.body, r.queryParams, r.pathParams, r.headers)
+	return r.client.doRequest(http.MethodGet, url, r.body, r.queryParams, r.pathParams, r.headers)
 }
 
 // Post executes a POST request
 func (r *RequestBuilder) Post(url string) (*Response, error) {
-	return r.client.doRequest("POST", url, r.body, r.queryParams, r.pathParams, r.headers)
+	return r.client.doRequest(http.MethodPost, url, r.body, r.queryParams, r.pathParams, r.headers)
 }
 
 // Put executes a PUT request
 func (r *RequestBuilder) Put(url string) (*Response, error) {
-	return r.client.doRequest("PUT", url, r.body, r.queryParams, r.pathParams, r.headers)
+	return r.client.doRequest(http.MethodPut, url, r.body, r.queryParams, r.pathParams, r.headers)
 }
 
 // Patch executes a PATCH request
 func (r *RequestBuilder) Patch(url string) (*Response, error) {
-	return r.client.doRequest("PATCH", url, r.body, r.queryParams, r.pathParams, r.headers)
+	return r.client.doRequest(http.MethodPatch, url, r.body, r.queryParams, r.pathParams, r.headers)
 }
 
 // Delete executes a DELETE request
 func (r *RequestBuilder) Delete(url string) (*Response, error) {
-	return r.client.doRequest("DELETE", url, r.body, r.queryParams, r.pathParams, r.headers)
+	return r.client.doRequest(http.MethodDelete, url, r.body, r.queryParams, r.pathParams, r.headers)
 }
 
 // doRequest performs the actual HTTP request
@@ -136,10 +148,8 @@ func (c *Client) doRequest(method, urlStr string, body interface{}, queryParams,
 	}
 
 	// Replace path parameters
-	if pathParams != nil {
-		for key, value := range pathParams {
-			fullURL = strings.ReplaceAll(fullURL, "{"+key+"}", value)
-		}
+	for key, value := range pathParams {
+		fullURL = strings.ReplaceAll(fullURL, "{"+key+"}", value)
 	}
 
 	// Parse URL and add query parameters
@@ -200,8 +210,31 @@ func (c *Client) doRequest(method, urlStr string, body interface{}, queryParams,
 		return nil, fmt.Errorf("failed to read response body: %w", err)
 	}
 
+	// Parse JSON body if content-type is JSON
+	var parsedBody interface{}
+	contentType := resp.Header.Get("Content-Type")
+	if strings.Contains(contentType, "application/json") && len(respBody) > 0 {
+		if err := json.Unmarshal(respBody, &parsedBody); err != nil {
+			// If JSON parsing fails, just use the raw string
+			parsedBody = string(respBody)
+		}
+	} else {
+		parsedBody = string(respBody)
+	}
+
 	return &Response{
-		Response: resp,
-		body:     respBody,
+		Status:           resp.Status,
+		StatusCode:       resp.StatusCode,
+		Proto:            resp.Proto,
+		ProtoMajor:       resp.ProtoMajor,
+		ProtoMinor:       resp.ProtoMinor,
+		Header:           resp.Header,
+		ContentLength:    resp.ContentLength,
+		TransferEncoding: resp.TransferEncoding,
+		Close:            resp.Close,
+		Uncompressed:     resp.Uncompressed,
+		Trailer:          resp.Trailer,
+		body:             respBody,
+		ParsedBody:       parsedBody,
 	}, nil
 }
