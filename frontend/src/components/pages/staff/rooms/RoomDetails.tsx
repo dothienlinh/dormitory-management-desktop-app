@@ -30,7 +30,7 @@ export default function RoomDetails() {
       console.log("Adding student:", values);
 
       alert(
-        `Đã thêm sinh viên ${values.name} vào phòng ${room?.Body?.data.room_number}`
+        `Đã thêm sinh viên ${values.name} vào phòng ${room?.ParsedBody?.data.room_number}`
       );
 
       setIsAddingStudent(false);
@@ -68,13 +68,13 @@ export default function RoomDetails() {
   return (
     <div className="space-y-6">
       <RoomHeader
-        room={room?.Body.data}
+        room={room?.ParsedBody.data}
         onEdit={handleEditRoom}
         id={id ? +id : 0}
       />
 
       <div className="grid gap-6 md:grid-cols-6">
-        <RoomInfoCard room={room?.Body.data} />
+        <RoomInfoCard room={room?.ParsedBody.data} />
 
         <Card className="md:col-span-4">
           <Tabs defaultValue="occupants">
@@ -89,7 +89,7 @@ export default function RoomDetails() {
             </CardHeader>
             <CardContent>
               <OccupantsTable
-                room={room?.Body.data}
+                room={room?.ParsedBody.data}
                 openStudentDialog={openStudentDialog}
                 setOpenStudentDialog={setOpenStudentDialog}
                 isAddingStudent={isAddingStudent}
@@ -97,7 +97,7 @@ export default function RoomDetails() {
               />
 
               <MaintenanceTable
-                room={room?.Body.data}
+                room={room?.ParsedBody.data}
                 openMaintenanceDialog={openMaintenanceDialog}
                 setOpenMaintenanceDialog={setOpenMaintenanceDialog}
               />

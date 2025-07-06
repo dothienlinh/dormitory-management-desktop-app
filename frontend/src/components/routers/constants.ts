@@ -1,9 +1,9 @@
-import { UserRole } from "@/enums";
+import { UserRole } from "@/enums/user";
 
 export const MAP_ROLE_TO_PATH = {
   [UserRole.STUDENT]: "/student",
   [UserRole.ADMIN]: "/admin",
-  [UserRole.STAFF]: "/admin",
+  [UserRole.STAFF]: "/staff",
 };
 
 export const PUBLIC_ROUTES = [

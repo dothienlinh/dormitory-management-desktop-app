@@ -18,6 +18,7 @@ func (a *AuthAPI) Login(email, password string) (*client.Response, error) {
 	body := map[string]string{
 		"email":    email,
 		"password": password,
+		"type":     "manager",
 	}
 
 	resp, err := a.client.R().

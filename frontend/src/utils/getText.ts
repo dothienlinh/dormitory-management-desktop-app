@@ -1,4 +1,4 @@
-import { Gender, UserStatus } from "@/enums";
+import { Gender, UserStatus } from "@/enums/user";
 
 export const getGenderTextUser = (gender: Gender) => {
   switch (gender) {

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useSearchParams } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import {
   Table,
   TableBody,
@@ -17,6 +17,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
 import {
   Card,
   CardContent,
@@ -24,47 +25,41 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Search, Filter } from "lucide-react";
+import { PlusCircle, Search, Filter, FileDown } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
-import { User as IUser, UserQueryParams } from "@/interfaces/user";
-import { Gender, UserStatus } from "@/enums";
-import { getGenderTextUser, getStatusTextUser } from "@/utils/getText";
+import { Contract, ContractQueryParams } from "@/interfaces/contract";
+import { getStatusColorContract, getStatusTextContract } from "@/utils/getText";
 import { PaginationWithLinks } from "@/components/ui/pagination-with-links";
+import { ContractStatus } from "@/enums/contract";
 import { useDebounce } from "use-debounce";
-import { GetListUsers } from "wailsjs/go/app/App";
+import { GetListContracts } from "wailsjs/go/app/App";
 
-export default function Students() {
+export default function Contracts() {
+  const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState<string>();
   const [searchTermDebounced] = useDebounce(searchTerm, 1000);
   const [statusFilter, setStatusFilter] = useState("all");
-  const [genderFilter, setGenderFilter] = useState("all");
 
   const [searchParams, setSearchParams] = useSearchParams();
   const currentPage = searchParams.get("page") || 1;
 
-  const { data: listStudent, status } = useQuery({
+  const { data } = useQuery({
     queryKey: [
-      "users",
+      "contracts",
       {
         page: currentPage,
         keyword: searchTermDebounced,
         status: statusFilter !== "all" ? statusFilter : undefined,
-        gender: genderFilter !== "all" ? genderFilter : undefined,
-      } as UserQueryParams,
+      } as ContractQueryParams,
     ],
     queryFn: (query) => {
-      const [, params] = query.queryKey as [string, UserQueryParams];
-      return GetListUsers(
-        params.page || 1,
-        params.keyword,
-        params.order,
-        params.status,
-        params.gender
-      );
+      const [, params] = query.queryKey as [string, ContractQueryParams];
+      return GetListContracts(params?.page || 1, params.keyword);
     },
   });
-  const totalPage = listStudent?.Body?.total
-    ? Math.ceil(listStudent.Body.total / 10)
+
+  const totalPage = data?.ParsedBody.total
+    ? Math.ceil(data.ParsedBody.total / 10)
     : 0;
 
   const handleResetPage = () => {
@@ -79,37 +74,50 @@ export default function Students() {
       <div className="flex flex-col justify-between space-y-4 md:flex-row md:items-center md:space-y-0">
         <div>
           <h2 className="text-3xl font-bold tracking-tight">
-            Quản lý sinh viên
+            Quản lý hợp đồng
           </h2>
           <p className="text-muted-foreground">
-            Quản lý thông tin tất cả sinh viên trong ký túc xá
+            Quản lý tất cả các hợp đồng thuê phòng ký túc xá
           </p>
+        </div>
+        <div className="flex space-x-2">
+          <Button onClick={() => navigate("/admin/contracts/add")}>
+            <PlusCircle className="mr-2 h-4 w-4" />
+            Tạo hợp đồng mới
+          </Button>
+          <Button variant="outline">
+            <FileDown className="mr-2 h-4 w-4" />
+            Xuất báo cáo
+          </Button>
         </div>
       </div>
 
       <Card>
         <CardHeader>
-          <CardTitle>Danh sách sinh viên</CardTitle>
+          <CardTitle>Danh sách hợp đồng</CardTitle>
           <CardDescription>
-            Tổng số {listStudent?.Body?.data.length} sinh viên,{" "}
+            Tổng số {data?.ParsedBody.data.length} hợp đồng,{" "}
             {
-              listStudent?.Body?.data.filter(
-                (s: { status: UserStatus }) => s.status === UserStatus.Active
+              data?.ParsedBody.data.filter(
+                (c: { status: ContractStatus }) =>
+                  c.status === ContractStatus.ACTIVE
               ).length
             }{" "}
-            đang ở,{" "}
+            đang hiệu lực,{" "}
             {
-              listStudent?.Body?.data.filter(
-                (s: { status: UserStatus }) => s.status === UserStatus.Inactive
+              data?.ParsedBody.data.filter(
+                (c: { status: ContractStatus }) =>
+                  c.status === ContractStatus.INACTIVE
               ).length
             }{" "}
-            tạm vắng,{" "}
+            đã hết hạn,{" "}
             {
-              listStudent?.Body?.data.filter(
-                (s: { status: UserStatus }) => s.status === UserStatus.Absent
+              data?.ParsedBody.data.filter(
+                (c: { status: ContractStatus }) =>
+                  c.status === ContractStatus.CANCELLED
               ).length
             }{" "}
-            đã rời đi
+            đã chấm dứt
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -117,7 +125,7 @@ export default function Students() {
             <div className="flex w-full items-center space-x-2 md:w-1/3">
               <Search className="h-4 w-4 text-muted-foreground" />
               <Input
-                placeholder="Tìm kiếm theo tên, MSSV, email, SĐT..."
+                placeholder="Tìm kiếm theo sinh viên, phòng, mã hợp đồng..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="w-full"
@@ -138,101 +146,89 @@ export default function Students() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">Tất cả</SelectItem>
-                  <SelectItem value={UserStatus.Active}>Đang ở</SelectItem>
-                  <SelectItem value={UserStatus.Inactive}>Tạm vắng</SelectItem>
-                  <SelectItem value={UserStatus.Absent}>Đã rời đi</SelectItem>
-                </SelectContent>
-              </Select>
-
-              <Select
-                value={genderFilter}
-                onValueChange={(value) => {
-                  setGenderFilter(value);
-                  handleResetPage();
-                }}
-              >
-                <SelectTrigger className="w-[180px]">
-                  <SelectValue placeholder="Giới tính" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Tất cả</SelectItem>
-                  <SelectItem value={Gender.Male}>Nam</SelectItem>
-                  <SelectItem value={Gender.Female}>Nữ</SelectItem>
-                  <SelectItem value={Gender.Other}>Khác</SelectItem>
+                  <SelectItem value={ContractStatus.ACTIVE}>
+                    Đang hiệu lực
+                  </SelectItem>
+                  <SelectItem value={ContractStatus.INACTIVE}>
+                    Đã hết hạn
+                  </SelectItem>
+                  <SelectItem value={ContractStatus.CANCELLED}>
+                    Đã chấm dứt
+                  </SelectItem>
                 </SelectContent>
               </Select>
             </div>
           </div>
 
-          <div className="rounded-md border relative">
+          <div className="rounded-md border">
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>MSSV</TableHead>
-                  <TableHead>Họ tên</TableHead>
-                  <TableHead>Giới tính</TableHead>
-                  <TableHead>Liên hệ</TableHead>
+                  <TableHead>Mã hợp đồng</TableHead>
+                  <TableHead>Sinh viên</TableHead>
                   <TableHead>Phòng</TableHead>
-                  <TableHead>Hợp đồng</TableHead>
+                  <TableHead>Thời hạn</TableHead>
+                  <TableHead>Giá thuê (VND)</TableHead>
                   <TableHead>Trạng thái</TableHead>
+                  <TableHead>Ngày tạo</TableHead>
                   <TableHead></TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {status === "pending" ? (
-                  <TableRow>
-                    <TableCell colSpan={8} className="h-24 text-center">
-                      Đang tải dữ liệu...
-                    </TableCell>
-                  </TableRow>
-                ) : listStudent?.Body?.data &&
-                  listStudent?.Body?.data.length > 0 ? (
-                  listStudent.Body?.data.map((student: IUser) => (
-                    <TableRow key={student.id}>
+                {data?.ParsedBody.data && data?.ParsedBody.data.length > 0 ? (
+                  data.ParsedBody.data.map((contract: Contract) => (
+                    <TableRow key={contract.id}>
                       <TableCell className="font-medium">
-                        {student.student_code}
-                      </TableCell>
-                      <TableCell>{student.full_name}</TableCell>
-                      <TableCell>{getGenderTextUser(student.gender)}</TableCell>
-                      <TableCell>
-                        <div className="flex flex-col">
-                          <span className="text-xs">{student.email}</span>
-                          <span className="text-xs">{student.phone}</span>
-                        </div>
+                        {contract.code}
                       </TableCell>
                       <TableCell>
                         <Link
-                          to={`/admin/rooms/${student.room?.id}`}
+                          to={`/admin/students/${contract.user_id}`}
                           className="text-blue-600 hover:underline"
                         >
-                          {student.room?.room_number}
+                          {contract.user.full_name}
+                        </Link>
+                      </TableCell>
+                      <TableCell>
+                        <Link
+                          to={`/admin/rooms/${contract.room.id}`}
+                          className="text-blue-600 hover:underline"
+                        >
+                          {contract.room.room_number}
                         </Link>
                       </TableCell>
                       <TableCell>
                         <div className="flex flex-col">
                           <span className="text-xs">
-                            Từ: {new Date().toLocaleDateString("vi-VN")}
+                            Từ:{" "}
+                            {new Date(contract.start_date).toLocaleDateString(
+                              "vi-VN"
+                            )}
                           </span>
                           <span className="text-xs">
-                            Đến: {new Date().toLocaleDateString("vi-VN")}
+                            Đến:{" "}
+                            {new Date(contract.end_date).toLocaleDateString(
+                              "vi-VN"
+                            )}
                           </span>
                         </div>
                       </TableCell>
+                      <TableCell>{contract.price.toLocaleString()}</TableCell>
                       <TableCell>
-                        <span
-                          className={`inline-flex rounded-full px-2 py-1 text-xs font-semibold ${
-                            student.status === "active"
-                              ? "bg-green-100 text-green-800"
-                              : student.status === "inactive"
-                              ? "bg-yellow-100 text-yellow-800"
-                              : "bg-gray-100 text-gray-800"
-                          }`}
+                        <Badge
+                          variant="outline"
+                          className={getStatusColorContract(contract.status)}
                         >
-                          {getStatusTextUser(student.status)}
-                        </span>
+                          {getStatusTextContract(contract.status)}
+                        </Badge>
                       </TableCell>
                       <TableCell>
-                        <Link to={`/admin/students/${student.id}`}>
+                        {new Date(contract.created_at).toLocaleDateString(
+                          "vi-VN"
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        <Link to={`/admin/contracts/${contract.id}`}>
                           <Button variant="link" size="sm">
                             Chi tiết
                           </Button>
@@ -254,7 +250,7 @@ export default function Students() {
             {totalPage > 1 && status !== "pending" && (
               <PaginationWithLinks
                 page={+currentPage}
-                totalCount={listStudent?.Body?.total ?? 0}
+                totalCount={data?.ParsedBody.total ?? 0}
                 pageSearchParam="page"
               />
             )}

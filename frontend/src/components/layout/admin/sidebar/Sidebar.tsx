@@ -11,15 +11,11 @@ import {
   Sofa,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useSelector } from "react-redux";
+import { RootState } from "@/store";
+import { UserRole } from "@/enums/user";
 
-const sidebarItems = [
-  {
-    icon: LayoutDashboard,
-    label: "Tổng quan",
-    description: "Thông tin tổng quan",
-    path: "/admin",
-    regex: /^\/admin\/?$/,
-  },
+const sidebarStaffItems = [
   {
     icon: DoorOpen,
     label: "Quản lý phòng",
@@ -41,13 +37,7 @@ const sidebarItems = [
     path: "/admin/contracts",
     regex: /^\/admin\/contracts(\/.*)?$/,
   },
-  {
-    icon: Receipt,
-    label: "Quản lý tài chính",
-    description: "Quản lý thu chi tài chính",
-    path: "/admin/finance",
-    regex: /^\/admin\/finance(\/.*)?$/,
-  },
+
   {
     icon: Wrench,
     label: "Quản lý dịch vụ",
@@ -71,9 +61,37 @@ const sidebarItems = [
   },
 ];
 
+const sidebarAdminItems = [
+  {
+    icon: LayoutDashboard,
+    label: "Tổng quan",
+    description: "Thông tin tổng quan",
+    path: "/admin",
+    regex: /^\/admin\/?$/,
+  },
+  {
+    icon: Users,
+    label: "Quản lý tài khoản",
+    description: "Quản lý tài khoản người dùng",
+    path: "/admin/users",
+    regex: /^\/admin\/users(\/.*)?$/,
+  },
+  {
+    icon: Receipt,
+    label: "Quản lý tài chính",
+    description: "Quản lý thu chi tài chính",
+    path: "/admin/finance",
+    regex: /^\/admin\/finance(\/.*)?$/,
+  },
+];
+
 export default function Sidebar() {
   const location = useLocation();
   const currentPath = location.pathname;
+  const user = useSelector((state: RootState) => state.auth.user);
+
+  const sidebarItems =
+    user?.role === UserRole.ADMIN ? sidebarAdminItems : sidebarStaffItems;
 
   // Kiểm tra xem path hiện tại có match với sidebar item không
   const isActiveLink = (regex: RegExp) => {

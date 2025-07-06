@@ -33,7 +33,7 @@ import {
 import { ScrollArea } from "@/components/ui/scroll-area";
 // import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
-// import { Gender, UserRole, UserStatus } from "@/enums";
+// import { Gender, UserRole, UserStatus } from "@/enums/user";
 // import { RoomStatus } from "@/enums/rooms";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 import { CreateContract as ICreateContract } from "@/interfaces/contract";
@@ -111,10 +111,10 @@ export default function AddContracts() {
       GetListUsers(pageParam as number, null, null, null, null),
     initialPageParam: 1,
     getNextPageParam: (lastPage, allPages) => {
-      const hasMore = lastPage?.Body?.data.length >= 10;
+      const hasMore = lastPage?.ParsedBody.data.length >= 10;
       const nextPage = hasMore ? allPages.length + 1 : undefined;
       console.log(`📄 Students getNextPageParam:`, {
-        currentItems: lastPage?.Body?.data.length,
+        currentItems: lastPage?.ParsedBody.data.length,
         totalPages: allPages.length,
         nextPage,
       });
@@ -136,10 +136,10 @@ export default function AddContracts() {
     queryFn: ({ pageParam = 1 }) => GetListRooms(pageParam as number),
     initialPageParam: 1,
     getNextPageParam: (lastPage, allPages) => {
-      const hasMore = lastPage?.Body?.data.length >= 10;
+      const hasMore = lastPage?.ParsedBody.data.length >= 10;
       const nextPage = hasMore ? allPages.length + 1 : undefined;
       console.log(`📄 Rooms getNextPageParam:`, {
-        currentItems: lastPage?.Body?.data.length,
+        currentItems: lastPage?.ParsedBody.data.length,
         totalPages: allPages.length,
         nextPage,
       });
@@ -167,12 +167,12 @@ export default function AddContracts() {
   });
 
   const allStudents = useMemo(
-    () => studentsData?.pages.flatMap((page) => page?.Body?.data) ?? [],
+    () => studentsData?.pages.flatMap((page) => page?.ParsedBody.data) ?? [],
     [studentsData]
   );
 
   const allRooms = useMemo(
-    () => roomsData?.pages.flatMap((page) => page?.Body?.data) ?? [],
+    () => roomsData?.pages.flatMap((page) => page?.ParsedBody.data) ?? [],
     [roomsData]
   );
 

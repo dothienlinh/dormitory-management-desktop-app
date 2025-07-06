@@ -82,6 +82,10 @@ export function GetUserDetails(arg1) {
   return window['go']['app']['App']['GetUserDetails'](arg1);
 }
 
+export function LogData(arg1, arg2) {
+  return window['go']['app']['App']['LogData'](arg1, arg2);
+}
+
 export function Login(arg1, arg2) {
   return window['go']['app']['App']['Login'](arg1, arg2);
 }
@@ -92,6 +96,10 @@ export function Logout() {
 
 export function Register(arg1, arg2, arg3, arg4) {
   return window['go']['app']['App']['Register'](arg1, arg2, arg3, arg4);
+}
+
+export function SetToken(arg1) {
+  return window['go']['app']['App']['SetToken'](arg1);
 }
 
 export function UpdateAmenity(arg1, arg2) {
