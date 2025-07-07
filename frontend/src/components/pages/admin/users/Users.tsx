@@ -42,7 +42,6 @@ export default function Users() {
   const [selectedUser, setSelectedUser] = useState<IUser | null>(null);
   const [newStatus, setNewStatus] = useState<string>("");
 
-  // State cho user detail modal
   const [isUserDetailOpen, setIsUserDetailOpen] = useState(false);
   const [userDetailData, setUserDetailData] = useState<IUser | null>(null);
 
@@ -98,7 +97,6 @@ export default function Users() {
     }
   };
 
-  // Hàm mở modal chi tiết user
   const handleShowUserDetail = (user: IUser) => {
     setUserDetailData(user);
     setIsUserDetailOpen(true);
@@ -250,7 +248,6 @@ export default function Users() {
           </DialogHeader>
           {userDetailData && (
             <div className="space-y-6">
-              {/* Thông tin cơ bản */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-4">
                   <div>
@@ -343,7 +340,6 @@ export default function Users() {
                 </div>
               </div>
 
-              {/* Thông tin phòng và hợp đồng (chỉ cho sinh viên) */}
               {userDetailData.role === UserRole.STUDENT && (
                 <div className="border-t pt-4">
                   <h3 className="text-lg font-semibold mb-4">
@@ -371,7 +367,6 @@ export default function Users() {
                 </div>
               )}
 
-              {/* Thông tin thời gian */}
               <div className="border-t pt-4">
                 <h3 className="text-lg font-semibold mb-4">
                   Thông tin hệ thống
