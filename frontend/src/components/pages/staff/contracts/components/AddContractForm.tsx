@@ -24,6 +24,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { UserRole } from "@/enums/user";
 import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
 import { CreateContract as ICreateContract } from "@/interfaces/contract";
 import { Room } from "@/interfaces/room";
@@ -92,7 +93,15 @@ export function AddContractForm({ onOpenChange }: AddContractFormProps) {
     queryKey: ["students-infinite"],
     queryFn: ({ pageParam = 1 }) => {
       console.log(`🔍 Fetching students page: ${pageParam}`);
-      return GetListUsers(pageParam as number, null, null, null, null);
+      return GetListUsers(
+        String(pageParam as number),
+        "",
+        "",
+        "",
+        "",
+        "",
+        UserRole.STUDENT
+      );
     },
     initialPageParam: 1,
     getNextPageParam: (lastPage, allPages) => {
@@ -120,7 +129,7 @@ export function AddContractForm({ onOpenChange }: AddContractFormProps) {
     queryKey: ["rooms-infinite"],
     queryFn: ({ pageParam = 1 }) => {
       console.log(`🏠 Fetching rooms page: ${pageParam}`);
-      return GetListRooms(pageParam as number);
+      return GetListRooms(String(pageParam as number));
     },
     initialPageParam: 1,
     getNextPageParam: (lastPage, allPages) => {

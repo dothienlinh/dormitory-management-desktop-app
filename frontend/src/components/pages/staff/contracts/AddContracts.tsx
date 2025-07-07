@@ -68,6 +68,7 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import * as z from "zod";
 import { GetListUsers, GetListRooms, CreateContract } from "wailsjs/go/app/App";
+import { UserRole } from "@/enums/user";
 
 const contractSchema = z.object({
   user_id: z.number({
@@ -108,7 +109,15 @@ export default function AddContracts() {
   } = useInfiniteQuery({
     queryKey: ["students-infinite"],
     queryFn: ({ pageParam = 1 }) =>
-      GetListUsers(pageParam as number, null, null, null, null),
+      GetListUsers(
+        String(pageParam as number),
+        "",
+        "",
+        "",
+        "",
+        "",
+        UserRole.STUDENT
+      ),
     initialPageParam: 1,
     getNextPageParam: (lastPage, allPages) => {
       const hasMore = lastPage?.ParsedBody.data.length >= 10;
@@ -133,7 +142,7 @@ export default function AddContracts() {
     isError: isRoomsError,
   } = useInfiniteQuery({
     queryKey: ["rooms-infinite"],
-    queryFn: ({ pageParam = 1 }) => GetListRooms(pageParam as number),
+    queryFn: ({ pageParam = 1 }) => GetListRooms(String(pageParam as number)),
     initialPageParam: 1,
     getNextPageParam: (lastPage, allPages) => {
       const hasMore = lastPage?.ParsedBody.data.length >= 10;

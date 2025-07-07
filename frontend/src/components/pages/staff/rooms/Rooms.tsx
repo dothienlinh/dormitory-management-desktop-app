@@ -64,7 +64,7 @@ export default function Rooms() {
 
   const { data: listRoom, isLoading } = useQuery({
     queryKey: ["rooms"],
-    queryFn: () => GetListRooms(1),
+    queryFn: () => GetListRooms("1"),
   });
 
   return (

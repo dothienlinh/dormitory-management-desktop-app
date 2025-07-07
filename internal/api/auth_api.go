@@ -74,3 +74,18 @@ func (a *AuthAPI) Register(email, password, full_name, phone string) (*client.Re
 
 	return resp, nil
 }
+
+func (a *AuthAPI) GetMe() (*client.Response, error) {
+	resp, err := a.client.R().
+		Get("/auth/me")
+
+	if err != nil {
+		return nil, err
+	}
+
+	if resp.IsError() {
+		return resp, nil
+	}
+
+	return resp, nil
+}

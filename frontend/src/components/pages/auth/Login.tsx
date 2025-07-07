@@ -21,6 +21,8 @@ import { PasswordInput } from "@/components/ui/password-input";
 import { toast } from "sonner";
 import { Login, SetToken } from "wailsjs/go/app/App";
 import { UserRole } from "@/enums/user";
+import { IResponse } from "@/interfaces/service";
+import { Login as ILogin } from "@/interfaces/auth";
 
 const loginFormSchema = z.object({
   email: z.string().min(1, { message: "Email không được để trống" }).email({
@@ -35,28 +37,23 @@ export default function LoginComponent() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const { mutateAsync, isPending } = useMutation({
+  const { mutate, isPending } = useMutation({
     mutationFn: (data: LoginFormValues) => Login(data.email, data.password),
     onSuccess: (data) => {
-      console.log("Login success data:", data);
-      console.log("ParsedBody:", data?.ParsedBody);
-
-      if (data?.ParsedBody?.data?.user) {
-        dispatch(setUser(data.ParsedBody.data.user));
-        const userRole = data.ParsedBody.data.user.role as UserRole;
-        SetToken(data?.ParsedBody?.data?.access_token || "");
+      const responseData = data?.ParsedBody as IResponse<ILogin>;
+      if (responseData.data?.user) {
+        dispatch(setUser(responseData.data.user));
+        const userRole = responseData.data.user.role as UserRole;
+        SetToken(responseData.data.access_token || "");
         const redirectPath = MAP_ROLE_TO_PATH[userRole];
-        console.log("User role:", userRole, "Redirect path:", redirectPath);
 
         if (redirectPath) {
           navigate(redirectPath);
         } else {
-          console.error("No redirect path found for role:", userRole);
           toast.error("Không thể xác định quyền hạn của người dùng");
         }
       } else {
-        console.error("Invalid response structure:", data);
-        toast.error("Dữ liệu phản hồi không hợp lệ");
+        toast.error(responseData.message || "Đăng nhập không thành công");
       }
     },
     onError: (error) => {
@@ -73,14 +70,7 @@ export default function LoginComponent() {
   });
 
   async function onSubmit(values: LoginFormValues) {
-    toast.promise(mutateAsync(values), {
-      loading: "Đang đăng nhập...",
-      success: "Đăng nhập thành công!",
-      error: (err) => {
-        const errorMessage = err?.message || "Đăng nhập thất bại";
-        return errorMessage;
-      },
-    });
+    mutate(values);
   }
 
   return (

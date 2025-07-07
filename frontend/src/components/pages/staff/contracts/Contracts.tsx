@@ -54,7 +54,7 @@ export default function Contracts() {
     ],
     queryFn: (query) => {
       const [, params] = query.queryKey as [string, ContractQueryParams];
-      return GetListContracts(params?.page || 1, params.keyword);
+      return GetListContracts(String(params?.page || 1), params.keyword);
     },
   });
 

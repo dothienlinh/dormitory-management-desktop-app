@@ -19,7 +19,7 @@ export default function Amenities() {
 
   const { data: amenities, isLoading } = useQuery({
     queryKey: ["amenities"],
-    queryFn: () => GetListAmenities(1),
+    queryFn: () => GetListAmenities("1"),
   });
 
   if (isLoading) {

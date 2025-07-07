@@ -6,6 +6,7 @@ import (
 	"context"
 	"errors"
 	"log"
+	"strconv"
 )
 
 type App struct {
@@ -71,6 +72,14 @@ func (a *App) Register(email, password, fullName, phone string) (*client.Respons
 	return a.api.Auth().Register(email, password, fullName, phone)
 }
 
+func (a *App) GetMe() (*client.Response, error) {
+	if a.ctx == nil {
+		return nil, context.Canceled
+	}
+
+	return a.api.Auth().GetMe()
+}
+
 func (a *App) GetUserDetails(userID string) (*client.Response, error) {
 	if a.ctx == nil {
 		return nil, context.Canceled
@@ -79,28 +88,54 @@ func (a *App) GetUserDetails(userID string) (*client.Response, error) {
 	return a.api.User().GetUserDetails(userID)
 }
 
-func (a *App) GetListUsers(page int, keyword *string, order *string, status *string, gender *string) (*client.Response, error) {
+func (a *App) GetListUsers(page string, keyword string, order string, status string, gender string, statusAccount string, role string) (*client.Response, error) {
 	if a.ctx == nil {
 		return nil, context.Canceled
 	}
 
-	return a.api.User().GetListUsers(page, keyword, order, status, gender)
+	// Convert page string to int
+	pageInt, err := strconv.Atoi(page)
+	if err != nil {
+		return nil, errors.New("invalid page number: " + page)
+	}
+
+	return a.api.User().GetListUsers(pageInt, keyword, order, status, gender, statusAccount, role)
 }
 
-func (a *App) GetRoomDetails(roomID int) (*client.Response, error) {
+func (a *App) UpdateUserStatus(userID string, statusAccount string) (*client.Response, error) {
 	if a.ctx == nil {
 		return nil, context.Canceled
 	}
 
-	return a.api.Room().GetRoomDetails(roomID)
+	return a.api.User().UpdateUserStatus(userID, statusAccount)
 }
 
-func (a *App) GetListRooms(page int) (*client.Response, error) {
+func (a *App) GetRoomDetails(roomID string) (*client.Response, error) {
 	if a.ctx == nil {
 		return nil, context.Canceled
 	}
 
-	return a.api.Room().GetListRooms(page)
+	// Convert roomID string to int
+	roomIDInt, err := strconv.Atoi(roomID)
+	if err != nil {
+		return nil, errors.New("invalid room ID: " + roomID)
+	}
+
+	return a.api.Room().GetRoomDetails(roomIDInt)
+}
+
+func (a *App) GetListRooms(page string) (*client.Response, error) {
+	if a.ctx == nil {
+		return nil, context.Canceled
+	}
+
+	// Convert page string to int
+	pageInt, err := strconv.Atoi(page)
+	if err != nil {
+		return nil, errors.New("invalid page number: " + page)
+	}
+
+	return a.api.Room().GetListRooms(pageInt)
 }
 
 func (a *App) CreateRoom(roomData map[string]interface{}) (*client.Response, error) {
@@ -111,35 +146,59 @@ func (a *App) CreateRoom(roomData map[string]interface{}) (*client.Response, err
 	return a.api.Room().CreateRoom(roomData)
 }
 
-func (a *App) DeleteRoom(roomID int) (*client.Response, error) {
+func (a *App) DeleteRoom(roomID string) (*client.Response, error) {
 	if a.ctx == nil {
 		return nil, context.Canceled
 	}
 
-	return a.api.Room().DeleteRoom(roomID)
+	// Convert roomID string to int
+	roomIDInt, err := strconv.Atoi(roomID)
+	if err != nil {
+		return nil, errors.New("invalid room ID: " + roomID)
+	}
+
+	return a.api.Room().DeleteRoom(roomIDInt)
 }
-func (a *App) UpdateRoom(roomID int, roomData map[string]interface{}) (*client.Response, error) {
+func (a *App) UpdateRoom(roomID string, roomData map[string]interface{}) (*client.Response, error) {
 	if a.ctx == nil {
 		return nil, context.Canceled
 	}
 
-	return a.api.Room().UpdateRoom(roomID, roomData)
+	// Convert roomID string to int
+	roomIDInt, err := strconv.Atoi(roomID)
+	if err != nil {
+		return nil, errors.New("invalid room ID: " + roomID)
+	}
+
+	return a.api.Room().UpdateRoom(roomIDInt, roomData)
 }
 
-func (a *App) GetContractDetails(contractID int) (*client.Response, error) {
+func (a *App) GetContractDetails(contractID string) (*client.Response, error) {
 	if a.ctx == nil {
 		return nil, context.Canceled
 	}
 
-	return a.api.Contract().GetContractDetails(contractID)
+	// Convert contractID string to int
+	contractIDInt, err := strconv.Atoi(contractID)
+	if err != nil {
+		return nil, errors.New("invalid contract ID: " + contractID)
+	}
+
+	return a.api.Contract().GetContractDetails(contractIDInt)
 }
 
-func (a *App) GetListContracts(page int, keyword *string) (*client.Response, error) {
+func (a *App) GetListContracts(page string, keyword *string) (*client.Response, error) {
 	if a.ctx == nil {
 		return nil, context.Canceled
 	}
 
-	return a.api.Contract().GetListContracts(page, keyword)
+	// Convert page string to int
+	pageInt, err := strconv.Atoi(page)
+	if err != nil {
+		return nil, errors.New("invalid page number: " + page)
+	}
+
+	return a.api.Contract().GetListContracts(pageInt, keyword)
 }
 
 func (a *App) CreateContract(contractData map[string]interface{}) (*client.Response, error) {
@@ -158,12 +217,18 @@ func (a *App) GetAmenityDetails(amenityID string) (*client.Response, error) {
 	return a.api.Amenities().GetAmenityDetails(amenityID)
 }
 
-func (a *App) GetListAmenities(page int) (*client.Response, error) {
+func (a *App) GetListAmenities(page string) (*client.Response, error) {
 	if a.ctx == nil {
 		return nil, context.Canceled
 	}
 
-	return a.api.Amenities().GetListAmenities(page)
+	// Convert page string to int
+	pageInt, err := strconv.Atoi(page)
+	if err != nil {
+		return nil, errors.New("invalid page number: " + page)
+	}
+
+	return a.api.Amenities().GetListAmenities(pageInt)
 }
 
 func (a *App) CreateAmenity(amenityData map[string]interface{}) (*client.Response, error) {

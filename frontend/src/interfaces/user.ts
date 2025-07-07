@@ -1,4 +1,4 @@
-import { Gender, UserRole, UserStatus } from "@/enums/user";
+import { Gender, UserRole, UserStatus, UserStatusAccount } from "@/enums/user";
 import { Room } from "./room";
 import { Pagination } from "./service";
 import { OrderBy } from "@/enums";
@@ -13,6 +13,7 @@ export interface User {
   role: UserRole;
   gender: Gender;
   status: UserStatus;
+  status_account: UserStatusAccount;
   phone: string;
   is_verify: boolean;
   birthday: string | null;
@@ -37,4 +38,6 @@ export interface UserQueryParams extends Pagination {
   order?: OrderBy;
   status?: UserStatus;
   gender?: Gender;
+  role?: UserRole;
+  status_account?: UserStatusAccount;
 }

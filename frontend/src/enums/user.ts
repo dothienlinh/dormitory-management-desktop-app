@@ -11,7 +11,14 @@ export enum Gender {
 }
 
 export enum UserStatus {
-  Active = "active",
-  Inactive = "inactive",
-  Absent = "absent",
+  ACTIVE = "active",
+  INACTIVE = "inactive",
+  ABSENT = "absent",
+}
+
+export enum UserStatusAccount {
+  PENDING = "pending",
+  APPROVED = "approved",
+  REJECTED = "rejected",
+  BANNED = "banned",
 }

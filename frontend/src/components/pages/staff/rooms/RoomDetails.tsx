@@ -20,7 +20,7 @@ export default function RoomDetails() {
 
   const { data: room, isLoading } = useQuery({
     queryKey: ["room", id],
-    queryFn: () => GetRoomDetails(id ? +id : 0),
+    queryFn: () => GetRoomDetails(id || "0"),
   });
 
   const handleAddStudent = (values: AddStudentValues) => {

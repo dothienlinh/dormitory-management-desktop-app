@@ -26,7 +26,7 @@ type RoomHeaderProps = {
 export function RoomHeader({ room, onEdit, id }: RoomHeaderProps) {
   const navigate = useNavigate();
   const { mutateAsync, isPending } = useMutation({
-    mutationFn: () => DeleteRoom(id),
+    mutationFn: () => DeleteRoom(String(id)),
     onSuccess: () => {
       navigate("/staff/rooms");
     },
