@@ -69,7 +69,7 @@ export default function AddRoom() {
 
   const { data: amenities, isLoading: isLoadingAmenities } = useQuery({
     queryKey: ["amenities"],
-    queryFn: () => GetListAmenities(1),
+    queryFn: () => GetListAmenities("1"),
   });
 
   const { data: listRoomCategories, isLoading: isLoadingListRoomCategories } =

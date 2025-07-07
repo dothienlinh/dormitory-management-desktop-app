@@ -27,7 +27,7 @@ import {
 import { Search, Filter } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { User as IUser, UserQueryParams } from "@/interfaces/user";
-import { Gender, UserStatus } from "@/enums/user";
+import { Gender, UserRole, UserStatus } from "@/enums/user";
 import { getGenderTextUser, getStatusTextUser } from "@/utils/getText";
 import { PaginationWithLinks } from "@/components/ui/pagination-with-links";
 import { useDebounce } from "use-debounce";
@@ -55,11 +55,13 @@ export default function Students() {
     queryFn: (query) => {
       const [, params] = query.queryKey as [string, UserQueryParams];
       return GetListUsers(
-        params.page || 1,
-        params.keyword,
-        params.order,
-        params.status,
-        params.gender
+        String(params.page || 1),
+        params.keyword || "",
+        params.order || "",
+        params.status || "",
+        params.gender || "",
+        "",
+        UserRole.STUDENT
       );
     },
   });
@@ -94,19 +96,19 @@ export default function Students() {
             Tổng số {listStudent?.ParsedBody.data.length} sinh viên,{" "}
             {
               listStudent?.ParsedBody.data.filter(
-                (s: { status: UserStatus }) => s.status === UserStatus.Active
+                (s: { status: UserStatus }) => s.status === UserStatus.ACTIVE
               ).length
             }{" "}
             đang ở,{" "}
             {
               listStudent?.ParsedBody.data.filter(
-                (s: { status: UserStatus }) => s.status === UserStatus.Inactive
+                (s: { status: UserStatus }) => s.status === UserStatus.INACTIVE
               ).length
             }{" "}
             tạm vắng,{" "}
             {
               listStudent?.ParsedBody.data.filter(
-                (s: { status: UserStatus }) => s.status === UserStatus.Absent
+                (s: { status: UserStatus }) => s.status === UserStatus.ABSENT
               ).length
             }{" "}
             đã rời đi
@@ -138,9 +140,9 @@ export default function Students() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">Tất cả</SelectItem>
-                  <SelectItem value={UserStatus.Active}>Đang ở</SelectItem>
-                  <SelectItem value={UserStatus.Inactive}>Tạm vắng</SelectItem>
-                  <SelectItem value={UserStatus.Absent}>Đã rời đi</SelectItem>
+                  <SelectItem value={UserStatus.ACTIVE}>Đang ở</SelectItem>
+                  <SelectItem value={UserStatus.INACTIVE}>Tạm vắng</SelectItem>
+                  <SelectItem value={UserStatus.ABSENT}>Đã rời đi</SelectItem>
                 </SelectContent>
               </Select>
 

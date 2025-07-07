@@ -16,29 +16,31 @@ export function DeleteAmenity(arg1:string):Promise<client.Response>;
 
 export function DeleteMaintenanceHistory(arg1:string):Promise<client.Response>;
 
-export function DeleteRoom(arg1:number):Promise<client.Response>;
+export function DeleteRoom(arg1:string):Promise<client.Response>;
 
 export function GetAmenityDetails(arg1:string):Promise<client.Response>;
 
-export function GetContractDetails(arg1:number):Promise<client.Response>;
+export function GetContractDetails(arg1:string):Promise<client.Response>;
 
-export function GetListAmenities(arg1:number):Promise<client.Response>;
+export function GetListAmenities(arg1:string):Promise<client.Response>;
 
-export function GetListContracts(arg1:number,arg2:any):Promise<client.Response>;
+export function GetListContracts(arg1:string,arg2:any):Promise<client.Response>;
 
 export function GetListMaintenanceHistories(arg1:string,arg2:string):Promise<client.Response>;
 
 export function GetListRoomCategories(arg1:string):Promise<client.Response>;
 
-export function GetListRooms(arg1:number):Promise<client.Response>;
+export function GetListRooms(arg1:string):Promise<client.Response>;
 
-export function GetListUsers(arg1:number,arg2:any,arg3:any,arg4:any,arg5:any):Promise<client.Response>;
+export function GetListUsers(arg1:string,arg2:string,arg3:string,arg4:string,arg5:string,arg6:string,arg7:string):Promise<client.Response>;
 
 export function GetMaintenanceHistoryDetails(arg1:string):Promise<client.Response>;
 
+export function GetMe():Promise<client.Response>;
+
 export function GetRoomCategoryDetails(arg1:string):Promise<client.Response>;
 
-export function GetRoomDetails(arg1:number):Promise<client.Response>;
+export function GetRoomDetails(arg1:string):Promise<client.Response>;
 
 export function GetUserDetails(arg1:string):Promise<client.Response>;
 
@@ -56,4 +58,6 @@ export function UpdateAmenity(arg1:string,arg2:Record<string, any>):Promise<clie
 
 export function UpdateMaintenanceHistory(arg1:string,arg2:Record<string, any>):Promise<client.Response>;
 
-export function UpdateRoom(arg1:number,arg2:Record<string, any>):Promise<client.Response>;
+export function UpdateRoom(arg1:string,arg2:Record<string, any>):Promise<client.Response>;
+
+export function UpdateUserStatus(arg1:string,arg2:string):Promise<client.Response>;

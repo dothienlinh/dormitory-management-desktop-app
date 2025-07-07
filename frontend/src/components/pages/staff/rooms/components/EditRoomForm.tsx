@@ -74,7 +74,7 @@ export default function EditRoomForm({
 
   const { mutateAsync, isPending } = useMutation({
     mutationFn: (data: FormValues) =>
-      UpdateRoom(id ? +id : 0, {
+      UpdateRoom(id ? String(id) : "0", {
         room_number: data.roomNumber,
         status: data.status,
         room_category_id: +data.type,

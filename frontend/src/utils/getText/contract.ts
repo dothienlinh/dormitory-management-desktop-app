@@ -1,31 +1,3 @@
-import { Gender, UserStatus } from "@/enums/user";
-
-export const getGenderTextUser = (gender: Gender) => {
-  switch (gender) {
-    case Gender.Male:
-      return "Nam";
-    case Gender.Female:
-      return "Nữ";
-    case Gender.Other:
-      return "Khác";
-    default:
-      return gender;
-  }
-};
-
-export const getStatusTextUser = (status: UserStatus) => {
-  switch (status) {
-    case UserStatus.Active:
-      return "Đang ở";
-    case UserStatus.Absent:
-      return "Tạm vắng";
-    case UserStatus.Inactive:
-      return "Đã rời đi";
-    default:
-      return status;
-  }
-};
-
 export const getStatusTextContract = (status: string) => {
   switch (status) {
     case "active":

@@ -1,17 +1,10 @@
-import {
-  BrowserRouter,
-  Navigate,
-  Route,
-  Routes,
-  useNavigate,
-} from "react-router-dom";
+import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import NotFound from "@/components/layout/not-found";
-import { lazy, Suspense, useEffect } from "react";
-import { useSelector } from "react-redux";
-import { RootState } from "@/store";
-import { MAP_ROLE_TO_PATH, PUBLIC_ROUTES } from "./constants";
+import { lazy, Suspense } from "react";
+import { MAP_ROLE_TO_PATH } from "./constants";
 import Register from "../pages/auth/Register";
 import { Icons } from "../ui/icons";
+import { useCheckAuth } from "@/hooks/useCheckAuth";
 
 const AuthLayout = lazy(() => import("@/components/layout/auth"));
 const Login = lazy(() => import("@/components/pages/auth/Login"));
@@ -75,26 +68,15 @@ const UserDetail = lazy(
 
 // Wrap all routes with this component that handles auth
 function ProtectedRoutes() {
-  const { user, isAuthenticated } = useSelector(
-    (state: RootState) => state.auth
-  );
-  const navigate = useNavigate();
+  const { isLoading, user, isAuthenticated } = useCheckAuth();
 
-  useEffect(() => {
-    const currentPath = window.location.pathname;
-
-    // Nếu user đã authenticated và đang ở trang public, redirect về dashboard
-    if (isAuthenticated && user && PUBLIC_ROUTES.includes(currentPath)) {
-      navigate(MAP_ROLE_TO_PATH[user.role], { replace: true });
-      return;
-    }
-
-    // Nếu user chưa authenticated và không ở trang public, redirect về login
-    if (!isAuthenticated && !PUBLIC_ROUTES.includes(currentPath)) {
-      navigate("/auth/login", { replace: true });
-      return;
-    }
-  }, [isAuthenticated, user, navigate]);
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <Icons.spinner className="h-20 w-20 animate-spin" />
+      </div>
+    );
+  }
 
   return (
     <Suspense

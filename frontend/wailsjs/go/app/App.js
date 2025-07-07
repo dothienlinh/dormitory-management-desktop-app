@@ -62,12 +62,16 @@ export function GetListRooms(arg1) {
   return window['go']['app']['App']['GetListRooms'](arg1);
 }
 
-export function GetListUsers(arg1, arg2, arg3, arg4, arg5) {
-  return window['go']['app']['App']['GetListUsers'](arg1, arg2, arg3, arg4, arg5);
+export function GetListUsers(arg1, arg2, arg3, arg4, arg5, arg6, arg7) {
+  return window['go']['app']['App']['GetListUsers'](arg1, arg2, arg3, arg4, arg5, arg6, arg7);
 }
 
 export function GetMaintenanceHistoryDetails(arg1) {
   return window['go']['app']['App']['GetMaintenanceHistoryDetails'](arg1);
+}
+
+export function GetMe() {
+  return window['go']['app']['App']['GetMe']();
 }
 
 export function GetRoomCategoryDetails(arg1) {
@@ -112,4 +116,8 @@ export function UpdateMaintenanceHistory(arg1, arg2) {
 
 export function UpdateRoom(arg1, arg2) {
   return window['go']['app']['App']['UpdateRoom'](arg1, arg2);
+}
+
+export function UpdateUserStatus(arg1, arg2) {
+  return window['go']['app']['App']['UpdateUserStatus'](arg1, arg2);
 }

@@ -24,7 +24,7 @@ export default function EditRoom() {
 
   const { data: amenities, isLoading: isLoadingAmenities } = useQuery({
     queryKey: ["amenities"],
-    queryFn: () => GetListAmenities(1),
+    queryFn: () => GetListAmenities("1"),
   });
 
   const { data: listRoomCategories, isLoading: isLoadingListRoomCategories } =
@@ -35,7 +35,7 @@ export default function EditRoom() {
 
   const { data: room, isLoading } = useQuery({
     queryKey: ["room", id],
-    queryFn: () => GetRoomDetails(id ? +id : 0),
+    queryFn: () => GetRoomDetails(id || "0"),
   });
 
   if (isLoading || isLoadingAmenities || isLoadingListRoomCategories) {
