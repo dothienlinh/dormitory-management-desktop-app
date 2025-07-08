@@ -102,6 +102,10 @@ export function Register(arg1, arg2, arg3, arg4) {
   return window['go']['app']['App']['Register'](arg1, arg2, arg3, arg4);
 }
 
+export function ResendVerifyAccount(arg1) {
+  return window['go']['app']['App']['ResendVerifyAccount'](arg1);
+}
+
 export function SetToken(arg1) {
   return window['go']['app']['App']['SetToken'](arg1);
 }
@@ -120,4 +124,8 @@ export function UpdateRoom(arg1, arg2) {
 
 export function UpdateUserStatus(arg1, arg2) {
   return window['go']['app']['App']['UpdateUserStatus'](arg1, arg2);
+}
+
+export function VerifyAccount(arg1, arg2) {
+  return window['go']['app']['App']['VerifyAccount'](arg1, arg2);
 }

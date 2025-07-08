@@ -1,7 +1,7 @@
 import { Outlet, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { LogOut, User, Bell, MoonStar, Sun, Search } from "lucide-react";
+import { LogOut, User, Bell, MoonStar, Sun } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/store";
 import {
@@ -13,7 +13,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import Sidebar from "./sidebar/Sidebar";
-import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { logout } from "@/store/authSlice";
@@ -99,18 +98,7 @@ export default function DashboardLayout() {
       {/* Main Content */}
       <main className="flex-1 ml-64 transition-all duration-300 ease-in-out">
         {/* Top Bar */}
-        <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b bg-background/70 backdrop-blur-md px-4 dark:bg-zinc-900/80 dark:border-zinc-800 transition-colors duration-300">
-          <div className="flex items-center gap-4">
-            <div className="relative hidden md:flex items-center max-w-xs">
-              <Search className="absolute left-2.5 h-4 w-4 text-muted-foreground" />
-              <Input
-                type="search"
-                placeholder="Tìm kiếm..."
-                className="pl-8 w-[250px] bg-background border-muted focus-visible:ring-primary/20 dark:bg-zinc-800/50"
-              />
-            </div>
-          </div>
-
+        <header className="sticky top-0 z-30 flex h-16 items-center justify-end border-b bg-background/70 backdrop-blur-md px-4 dark:bg-zinc-900/80 dark:border-zinc-800 transition-colors duration-300">
           <div className="flex items-center gap-2 sm:gap-4">
             <Button
               variant="ghost"

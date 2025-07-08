@@ -12,17 +12,19 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Loader2, LockKeyhole } from "lucide-react";
+import { AlertCircle, Loader2, LockKeyhole, Mail } from "lucide-react";
 import { useDispatch } from "react-redux";
 import { setUser } from "@/store/authSlice";
 import { useMutation } from "@tanstack/react-query";
 import { MAP_ROLE_TO_PATH } from "@/components/routers/constants";
 import { PasswordInput } from "@/components/ui/password-input";
 import { toast } from "sonner";
-import { Login, SetToken } from "wailsjs/go/app/App";
+import { Login, ResendVerifyAccount, SetToken } from "wailsjs/go/app/App";
 import { UserRole } from "@/enums/user";
 import { IResponse } from "@/interfaces/service";
 import { Login as ILogin } from "@/interfaces/auth";
+import { useState } from "react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 const loginFormSchema = z.object({
   email: z.string().min(1, { message: "Email không được để trống" }).email({
@@ -34,6 +36,8 @@ const loginFormSchema = z.object({
 type LoginFormValues = z.infer<typeof loginFormSchema>;
 
 export default function LoginComponent() {
+  const [showUnverifiedAlert, setShowUnverifiedAlert] = useState(false);
+  const [unverifiedEmail, setUnverifiedEmail] = useState("");
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -41,6 +45,16 @@ export default function LoginComponent() {
     mutationFn: (data: LoginFormValues) => Login(data.email, data.password),
     onSuccess: (data) => {
       const responseData = data?.ParsedBody as IResponse<ILogin>;
+
+      if (!responseData.data.is_verified) {
+        setShowUnverifiedAlert(true);
+        setUnverifiedEmail(responseData.data.user.email);
+        toast.warning(
+          "Tài khoản chưa được xác thực! Vui lòng kiểm tra email của bạn."
+        );
+        return;
+      }
+
       if (responseData.data?.user) {
         dispatch(setUser(responseData.data.user));
         const userRole = responseData.data.user.role as UserRole;
@@ -58,6 +72,23 @@ export default function LoginComponent() {
     },
     onError: (error) => {
       console.error("Login error:", error);
+    },
+  });
+
+  const { mutate: resendVerification, isPending: isResending } = useMutation({
+    mutationFn: () => ResendVerifyAccount(unverifiedEmail),
+    onSuccess: () => {
+      toast.success(
+        "Email xác thực đã được gửi lại! Vui lòng kiểm tra hộp thư của bạn."
+      );
+      setShowUnverifiedAlert(false);
+    },
+    onError: (error: unknown) => {
+      const errorMsg =
+        error instanceof Error
+          ? error.message
+          : "Có lỗi xảy ra khi gửi email xác thực";
+      toast.error(errorMsg);
     },
   });
 
@@ -84,6 +115,49 @@ export default function LoginComponent() {
         </div>
 
         <div className="bg-background p-6 sm:p-8 rounded-xl shadow-sm border">
+          {showUnverifiedAlert && (
+            <Alert className="mb-6 border-amber-200 bg-amber-50">
+              <AlertCircle className="h-4 w-4 text-amber-600" />
+              <AlertDescription className="text-amber-800">
+                <div className="space-y-2">
+                  <p className="font-medium">Tài khoản chưa được xác thực!</p>
+                  <p className="text-sm">
+                    Vui lòng kiểm tra email <strong>{unverifiedEmail}</strong>{" "}
+                    để xác thực tài khoản của bạn.
+                  </p>
+                  <div className="flex gap-2 mt-3">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => resendVerification()}
+                      disabled={isResending}
+                      className="border-amber-300 text-amber-800 hover:bg-amber-100"
+                    >
+                      {isResending ? (
+                        <>
+                          <Loader2 className="mr-2 h-3 w-3 animate-spin" />
+                          Đang gửi...
+                        </>
+                      ) : (
+                        <>
+                          <Mail className="mr-2 h-3 w-3" />
+                          Gửi lại email xác thực
+                        </>
+                      )}
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => setShowUnverifiedAlert(false)}
+                      className="text-amber-800 hover:bg-amber-100"
+                    >
+                      Đóng
+                    </Button>
+                  </div>
+                </div>
+              </AlertDescription>
+            </Alert>
+          )}
           <Form {...form}>
             <form
               onSubmit={form.handleSubmit(onSubmit)}
