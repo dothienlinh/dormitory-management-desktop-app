@@ -62,7 +62,6 @@ export default function TabsContentStudent({
                   <TableHead>Giới tính</TableHead>
                   <TableHead>Liên hệ</TableHead>
                   <TableHead>Phòng</TableHead>
-                  <TableHead>Hợp đồng</TableHead>
                   <TableHead>Trạng thái</TableHead>
                   <TableHead></TableHead>
                 </TableRow>
@@ -93,16 +92,6 @@ export default function TabsContentStudent({
                         <span className="text-blue-600 hover:underline cursor-pointer">
                           {student.room?.room_number}
                         </span>
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex flex-col">
-                          <span className="text-xs">
-                            Từ: {new Date().toLocaleDateString("vi-VN")}
-                          </span>
-                          <span className="text-xs">
-                            Đến: {new Date().toLocaleDateString("vi-VN")}
-                          </span>
-                        </div>
                       </TableCell>
                       <TableCell>
                         <span

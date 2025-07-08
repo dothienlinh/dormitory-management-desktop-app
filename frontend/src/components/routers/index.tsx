@@ -62,9 +62,6 @@ const Amenities = lazy(
 // );
 
 const Users = lazy(() => import("@/components/pages/admin/users/Users"));
-const UserDetail = lazy(
-  () => import("@/components/pages/admin/users/UserDetail")
-);
 
 // Wrap all routes with this component that handles auth
 function ProtectedRoutes() {
@@ -115,7 +112,6 @@ function ProtectedRoutes() {
           <Route path="finance/invoices" element={<Invoices />} />
 
           <Route path="users" element={<Users />} />
-          <Route path="users/:id" element={<UserDetail />} />
         </Route>
 
         <Route path="staff" element={<DashboardLayout />}>

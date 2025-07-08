@@ -52,6 +52,8 @@ export function Logout():Promise<client.Response>;
 
 export function Register(arg1:string,arg2:string,arg3:string,arg4:string):Promise<client.Response>;
 
+export function ResendVerifyAccount(arg1:string):Promise<client.Response>;
+
 export function SetToken(arg1:string):Promise<void>;
 
 export function UpdateAmenity(arg1:string,arg2:Record<string, any>):Promise<client.Response>;
@@ -61,3 +63,5 @@ export function UpdateMaintenanceHistory(arg1:string,arg2:Record<string, any>):P
 export function UpdateRoom(arg1:string,arg2:Record<string, any>):Promise<client.Response>;
 
 export function UpdateUserStatus(arg1:string,arg2:string):Promise<client.Response>;
+
+export function VerifyAccount(arg1:string,arg2:string):Promise<client.Response>;

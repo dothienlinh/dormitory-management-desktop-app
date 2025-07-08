@@ -4,6 +4,7 @@ export interface Login {
   access_token: string;
   refresh_token: string;
   user: User;
+  is_verified: boolean;
 }
 
 export interface RegisterData {

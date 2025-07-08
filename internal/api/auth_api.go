@@ -89,3 +89,44 @@ func (a *AuthAPI) GetMe() (*client.Response, error) {
 
 	return resp, nil
 }
+
+func (a *AuthAPI) VerifyAccount(token, email string) (*client.Response, error) {
+	body := map[string]string{
+		"token": token,
+		"email": email,
+	}
+
+	resp, err := a.client.R().
+		SetBody(body).
+		Post("/auth/verify-account")
+
+	if err != nil {
+		return nil, err
+	}
+
+	if resp.IsError() {
+		return resp, nil
+	}
+
+	return resp, nil
+}
+
+func (a *AuthAPI) ResendVerifyAccount(email string) (*client.Response, error) {
+	body := map[string]string{
+		"email": email,
+	}
+
+	resp, err := a.client.R().
+		SetBody(body).
+		Post("/auth/resend-verify-account")
+
+	if err != nil {
+		return nil, err
+	}
+
+	if resp.IsError() {
+		return resp, nil
+	}
+
+	return resp, nil
+}

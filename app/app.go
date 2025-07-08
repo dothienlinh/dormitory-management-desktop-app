@@ -80,6 +80,22 @@ func (a *App) GetMe() (*client.Response, error) {
 	return a.api.Auth().GetMe()
 }
 
+func (a *App) VerifyAccount(token, email string) (*client.Response, error) {
+	if a.ctx == nil {
+		return nil, context.Canceled
+	}
+
+	return a.api.Auth().VerifyAccount(token, email)
+}
+
+func (a *App) ResendVerifyAccount(email string) (*client.Response, error) {
+	if a.ctx == nil {
+		return nil, context.Canceled
+	}
+
+	return a.api.Auth().ResendVerifyAccount(email)
+}
+
 func (a *App) GetUserDetails(userID string) (*client.Response, error) {
 	if a.ctx == nil {
 		return nil, context.Canceled
