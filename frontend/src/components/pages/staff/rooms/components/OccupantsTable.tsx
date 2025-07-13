@@ -18,23 +18,19 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { TabsContent } from "@/components/ui/tabs";
-import { AddStudentForm, AddStudentValues } from "./AddStudentForm";
+import { AddStudentForm } from "./AddStudentForm";
 import { Room } from "@/interfaces/room";
 
 type OccupantsTableProps = {
   room: Room;
   openStudentDialog: boolean;
   setOpenStudentDialog: (open: boolean) => void;
-  isAddingStudent: boolean;
-  onAddStudent: (values: AddStudentValues) => void;
 };
 
 export function OccupantsTable({
   room,
   openStudentDialog,
   setOpenStudentDialog,
-  isAddingStudent,
-  onAddStudent,
 }: OccupantsTableProps) {
   return (
     <TabsContent value="occupants" className="mt-0">
@@ -92,8 +88,7 @@ export function OccupantsTable({
                         </DialogDescription>
                       </DialogHeader>
                       <AddStudentForm
-                        isAdding={isAddingStudent}
-                        onSubmit={onAddStudent}
+                        setOpenStudentDialog={setOpenStudentDialog}
                       />
                     </DialogContent>
                   </Dialog>

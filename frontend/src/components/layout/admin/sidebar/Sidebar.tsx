@@ -5,7 +5,6 @@ import {
   Users,
   FileText,
   Receipt,
-  Wrench,
   Shield,
   Home,
   Sofa,
@@ -36,14 +35,6 @@ const sidebarStaffItems = [
     description: "Quản lý thông tin hợp đồng",
     path: "/staff/contracts",
     regex: /^\/staff\/contracts(\/.*)?$/,
-  },
-
-  {
-    icon: Wrench,
-    label: "Quản lý dịch vụ",
-    description: "Quản lý dịch vụ KTX",
-    path: "/staff/services",
-    regex: /^\/staff\/services(\/.*)?$/,
   },
   {
     icon: Sofa,

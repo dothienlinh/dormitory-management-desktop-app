@@ -6,7 +6,6 @@ import { RoomHeader } from "./components/RoomHeader";
 import { RoomInfoCard } from "./components/RoomInfoCard";
 import { OccupantsTable } from "./components/OccupantsTable";
 import { MaintenanceTable } from "./components/MaintenanceTable";
-import { AddStudentValues } from "./components/AddStudentForm";
 import { useQuery } from "@tanstack/react-query";
 import { Icons } from "@/components/ui/icons";
 import { GetRoomDetails } from "wailsjs/go/app/App";
@@ -14,7 +13,6 @@ import { GetRoomDetails } from "wailsjs/go/app/App";
 export default function RoomDetails() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const [isAddingStudent, setIsAddingStudent] = useState(false);
   const [openStudentDialog, setOpenStudentDialog] = useState(false);
   const [openMaintenanceDialog, setOpenMaintenanceDialog] = useState(false);
 
@@ -22,21 +20,6 @@ export default function RoomDetails() {
     queryKey: ["room", id],
     queryFn: () => GetRoomDetails(id || "0"),
   });
-
-  const handleAddStudent = (values: AddStudentValues) => {
-    setIsAddingStudent(true);
-
-    setTimeout(() => {
-      console.log("Adding student:", values);
-
-      alert(
-        `Đã thêm sinh viên ${values.name} vào phòng ${room?.ParsedBody?.data.room_number}`
-      );
-
-      setIsAddingStudent(false);
-      setOpenStudentDialog(false);
-    }, 1500);
-  };
 
   const handleEditRoom = () => {
     navigate(`/staff/rooms/edit/${id}`);
@@ -92,8 +75,6 @@ export default function RoomDetails() {
                 room={room?.ParsedBody.data}
                 openStudentDialog={openStudentDialog}
                 setOpenStudentDialog={setOpenStudentDialog}
-                isAddingStudent={isAddingStudent}
-                onAddStudent={handleAddStudent}
               />
 
               <MaintenanceTable

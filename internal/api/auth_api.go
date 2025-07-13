@@ -130,3 +130,41 @@ func (a *AuthAPI) ResendVerifyAccount(email string) (*client.Response, error) {
 
 	return resp, nil
 }
+
+func (a *AuthAPI) SendForgotPasswordEmail(email string) (*client.Response, error) {
+	body := map[string]string{
+		"email": email,
+		"type":  "manager",
+	}
+
+	resp, err := a.client.R().
+		SetBody(body).
+		Post("/auth/forgot-password")
+
+	if err != nil {
+		return nil, err
+	}
+
+	if resp.IsError() {
+		return resp, nil
+	}
+
+	return resp, nil
+}
+
+func (a *AuthAPI) ResetPassword(body map[string]interface{}) (*client.Response, error) {
+
+	resp, err := a.client.R().
+		SetBody(body).
+		Post("/auth/reset-password")
+
+	if err != nil {
+		return nil, err
+	}
+
+	if resp.IsError() {
+		return resp, nil
+	}
+
+	return resp, nil
+}

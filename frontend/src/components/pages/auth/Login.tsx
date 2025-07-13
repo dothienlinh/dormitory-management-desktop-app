@@ -46,7 +46,12 @@ export default function LoginComponent() {
     onSuccess: (data) => {
       const responseData = data?.ParsedBody as IResponse<ILogin>;
 
-      if (!responseData.data.is_verified) {
+      if (!responseData.data) {
+        toast.error(responseData.message || "Đăng nhập không thành công");
+        return;
+      }
+
+      if (!responseData.data?.is_verified) {
         setShowUnverifiedAlert(true);
         setUnverifiedEmail(responseData.data.user.email);
         toast.warning(
@@ -72,6 +77,7 @@ export default function LoginComponent() {
     },
     onError: (error) => {
       console.error("Login error:", error);
+      toast.error(error.message || "Đăng nhập không thành công");
     },
   });
 
