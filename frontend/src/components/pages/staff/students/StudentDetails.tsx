@@ -13,7 +13,7 @@ import {
   TabsTrigger,
 } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, Edit } from "lucide-react";
+import { ChevronLeft } from "lucide-react";
 import { StudentProfile } from "./components/StudentProfile";
 // import { ContractHistory } from "./components/ContractHistory";
 // import { PaymentHistory } from "./components/PaymentHistory";
@@ -78,12 +78,6 @@ export default function StudentDetails() {
               MSSV: {student?.ParsedBody.data.student_code}
             </p>
           </div>
-        </div>
-        <div className="flex space-x-2">
-          <Button variant="outline">
-            <Edit className="mr-2 h-4 w-4" />
-            Chỉnh sửa
-          </Button>
         </div>
       </div>
 

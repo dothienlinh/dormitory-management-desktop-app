@@ -117,7 +117,8 @@ export default function Users() {
         "",
         "",
         statusAccountFilter !== "all" ? statusAccountFilter : "",
-        UserRole.STUDENT
+        UserRole.STUDENT,
+        null
       );
     },
     enabled: activeTab === UserRole.STUDENT,
@@ -133,7 +134,8 @@ export default function Users() {
         "",
         "",
         statusAccountFilter !== "all" ? statusAccountFilter : "",
-        UserRole.STAFF
+        UserRole.STAFF,
+        null
       );
     },
     enabled: activeTab === UserRole.STAFF,

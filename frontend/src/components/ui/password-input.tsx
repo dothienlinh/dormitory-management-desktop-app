@@ -69,7 +69,7 @@ const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>(
           variant="ghost"
           size="icon"
           tabIndex={-1}
-          className="absolute z-20 right-1 top-1 h-9 w-9 text-muted-foreground hover:text-foreground focus:ring-0 focus:ring-offset-0"
+          className="absolute z-20 right-0 top-0 h-9 w-9 text-muted-foreground hover:!bg-transparent focus:!bg-transparent focus:!outline-none focus:!ring-0"
           onClick={handleTogglePassword}
           onMouseDown={(e) => e.preventDefault()}
         >

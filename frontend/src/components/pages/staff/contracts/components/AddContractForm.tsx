@@ -100,7 +100,8 @@ export function AddContractForm({ onOpenChange }: AddContractFormProps) {
         "",
         "",
         "",
-        UserRole.STUDENT
+        UserRole.STUDENT,
+        null
       );
     },
     initialPageParam: 1,

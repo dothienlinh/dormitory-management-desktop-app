@@ -1,12 +1,10 @@
-import { format } from "date-fns";
-import { CalendarIcon, Loader2 } from "lucide-react";
+import { CheckIcon, ChevronsUpDownIcon, Loader2 } from "lucide-react";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
 import {
   Form,
-  FormControl,
   FormField,
   FormItem,
   FormLabel,
@@ -17,149 +15,235 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { Calendar } from "@/components/ui/calendar";
-import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
+import LoadingIndicator from "@/components/ui/loading-indicator";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { useCallback, useMemo, useState } from "react";
+import {
+  useInfiniteQuery,
+  useMutation,
+  useQueryClient,
+} from "@tanstack/react-query";
+import { GetListUsers, AddStudentToRoom } from "wailsjs/go/app/App";
+import { UserRole } from "@/enums/user";
+import { useInfiniteScroll } from "@/hooks/useInfiniteScroll";
+import { User as IUser } from "@/interfaces/user";
+import { useParams } from "react-router-dom";
 
 // Schema for adding a student to a room
 const addStudentSchema = z.object({
-  studentId: z.string().min(5, { message: "MSSV phải có ít nhất 5 ký tự" }),
-  name: z.string().min(2, { message: "Họ tên phải có ít nhất 2 ký tự" }),
-  joinDate: z.date({
-    required_error: "Vui lòng chọn ngày vào",
-  }),
-  contractEnd: z.date({
-    required_error: "Vui lòng chọn ngày hết hạn",
-  }),
+  user_id: z.string().min(1, { message: "MSSV không được để trống" }),
 });
 
 export type AddStudentValues = z.infer<typeof addStudentSchema>;
 
-type AddStudentFormProps = {
-  isAdding: boolean;
-  onSubmit: (values: AddStudentValues) => void;
-};
+interface AddStudentFormProps {
+  setOpenStudentDialog: (open: boolean) => void;
+}
 
-export function AddStudentForm({ isAdding, onSubmit }: AddStudentFormProps) {
+export function AddStudentForm({ setOpenStudentDialog }: AddStudentFormProps) {
+  const [openPopoverStudent, setOpenPopoverStudent] = useState(false);
+  const queryClient = useQueryClient();
+
+  const { id } = useParams<{ id: string }>();
+
   const form = useForm<AddStudentValues>({
     resolver: zodResolver(addStudentSchema),
     defaultValues: {
-      studentId: "",
-      name: "",
-      joinDate: new Date(),
-      contractEnd: new Date(new Date().setMonth(new Date().getMonth() + 6)),
+      user_id: "",
     },
   });
+
+  const {
+    data: studentsData,
+    fetchNextPage: fetchNextStudentsPage,
+    hasNextPage: hasNextStudentsPage,
+    isFetchingNextPage: isFetchingNextStudentsPage,
+    isLoading: isLoadingStudents,
+    isError: isStudentsError,
+  } = useInfiniteQuery({
+    queryKey: ["students-infinite"],
+    queryFn: ({ pageParam = 1 }) =>
+      GetListUsers(
+        String(pageParam as number),
+        "",
+        "",
+        "",
+        "",
+        "",
+        UserRole.STUDENT,
+        false
+      ),
+    initialPageParam: 1,
+    getNextPageParam: (lastPage, allPages) => {
+      const hasMore = lastPage?.ParsedBody.data.length >= 10;
+      const nextPage = hasMore ? allPages.length + 1 : undefined;
+      console.log(`📄 Students getNextPageParam:`, {
+        currentItems: lastPage?.ParsedBody.data.length,
+        totalPages: allPages.length,
+        nextPage,
+      });
+      return nextPage;
+    },
+    staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
+  });
+
+  const { ref: studentsRef, isThrottled: isStudentsThrottled } =
+    useInfiniteScroll({
+      hasNextPage: hasNextStudentsPage ?? false,
+      isFetchingNextPage: isFetchingNextStudentsPage,
+      fetchNextPage: fetchNextStudentsPage,
+      enabled: openPopoverStudent,
+      throttleDelay: 500,
+    });
+
+  const { mutate: addStudent, isPending } = useMutation({
+    mutationFn: (data: AddStudentValues) =>
+      AddStudentToRoom(id ? id : "0", data.user_id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["room", id],
+      });
+      form.reset();
+      setOpenPopoverStudent(false);
+    },
+  });
+  const allStudents = useMemo(
+    () => studentsData?.pages.flatMap((page) => page?.ParsedBody.data) ?? [],
+    [studentsData]
+  );
+
+  const handleStudentSelect = useCallback(
+    (studentId: number) => {
+      form.setValue("user_id", studentId.toString());
+      setOpenPopoverStudent(false);
+    },
+    [form]
+  );
+  const onSubmit = (data: AddStudentValues) => {
+    addStudent(data);
+    setOpenStudentDialog(false);
+  };
 
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
         <FormField
           control={form.control}
-          name="studentId"
+          name="user_id"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Mã số sinh viên</FormLabel>
-              <FormControl>
-                <Input placeholder="Nhập MSSV" {...field} />
-              </FormControl>
+              <FormLabel>Sinh viên</FormLabel>
+              <Popover
+                open={openPopoverStudent}
+                onOpenChange={setOpenPopoverStudent}
+                modal={true}
+              >
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    role="combobox"
+                    aria-expanded={openPopoverStudent}
+                    className={cn(
+                      "w-full justify-between",
+                      !field.value && "text-muted-foreground"
+                    )}
+                  >
+                    {allStudents.find((student) => student.id === +field.value)
+                      ?.full_name || "Chọn sinh viên..."}
+                    <ChevronsUpDownIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-full p-0">
+                  <Command>
+                    <CommandInput placeholder="Tìm kiếm sinh viên..." />
+                    <CommandList>
+                      <CommandEmpty>
+                        {isLoadingStudents
+                          ? "Đang tải danh sách sinh viên..."
+                          : isStudentsError
+                          ? "Lỗi tải dữ liệu sinh viên"
+                          : "Không tìm thấy sinh viên."}
+                      </CommandEmpty>
+                      <ScrollArea className="h-48 overflow-auto">
+                        <CommandGroup>
+                          {isStudentsError ? (
+                            <div className="p-2 text-sm text-red-500 text-center">
+                              <p>Không thể tải danh sách sinh viên</p>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() =>
+                                  queryClient.invalidateQueries({
+                                    queryKey: ["students-infinite"],
+                                  })
+                                }
+                                className="mt-1"
+                              >
+                                Thử lại
+                              </Button>
+                            </div>
+                          ) : (
+                            <>
+                              {allStudents.map((student: IUser) => (
+                                <CommandItem
+                                  key={student.id}
+                                  value={student.full_name}
+                                  onSelect={() =>
+                                    handleStudentSelect(student.id)
+                                  }
+                                >
+                                  <CheckIcon
+                                    className={cn(
+                                      "mr-2 h-4 w-4",
+                                      +field.value === student.id
+                                        ? "opacity-100"
+                                        : "opacity-0"
+                                    )}
+                                  />
+                                  <div className="flex flex-col">
+                                    <span>{student.full_name}</span>
+                                    {student.email && (
+                                      <span className="text-xs text-muted-foreground">
+                                        {student.email}
+                                      </span>
+                                    )}
+                                  </div>
+                                </CommandItem>
+                              ))}
+
+                              <div ref={studentsRef}>
+                                <LoadingIndicator
+                                  isFetching={isFetchingNextStudentsPage}
+                                  isThrottled={isStudentsThrottled}
+                                  hasNextPage={hasNextStudentsPage ?? false}
+                                  onLoadMore={fetchNextStudentsPage}
+                                />
+                              </div>
+                            </>
+                          )}
+                        </CommandGroup>
+                      </ScrollArea>
+                    </CommandList>
+                  </Command>
+                </PopoverContent>
+              </Popover>
               <FormMessage />
             </FormItem>
           )}
         />
-        <FormField
-          control={form.control}
-          name="name"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Họ và tên</FormLabel>
-              <FormControl>
-                <Input placeholder="Nhập họ tên sinh viên" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <div className="grid grid-cols-2 gap-4">
-          <FormField
-            control={form.control}
-            name="joinDate"
-            render={({ field }) => (
-              <FormItem className="flex flex-col">
-                <FormLabel>Ngày vào</FormLabel>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <FormControl>
-                      <Button
-                        variant={"outline"}
-                        className={cn(
-                          "w-full pl-3 text-left font-normal",
-                          !field.value && "text-muted-foreground"
-                        )}
-                      >
-                        {field.value ? (
-                          format(field.value, "dd/MM/yyyy")
-                        ) : (
-                          <span>Chọn ngày</span>
-                        )}
-                        <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                      </Button>
-                    </FormControl>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="start">
-                    <Calendar
-                      mode="single"
-                      selected={field.value}
-                      onSelect={field.onChange}
-                      initialFocus
-                    />
-                  </PopoverContent>
-                </Popover>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="contractEnd"
-            render={({ field }) => (
-              <FormItem className="flex flex-col">
-                <FormLabel>Ngày hết hạn</FormLabel>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <FormControl>
-                      <Button
-                        variant={"outline"}
-                        className={cn(
-                          "w-full pl-3 text-left font-normal",
-                          !field.value && "text-muted-foreground"
-                        )}
-                      >
-                        {field.value ? (
-                          format(field.value, "dd/MM/yyyy")
-                        ) : (
-                          <span>Chọn ngày</span>
-                        )}
-                        <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                      </Button>
-                    </FormControl>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="start">
-                    <Calendar
-                      mode="single"
-                      selected={field.value}
-                      onSelect={field.onChange}
-                      initialFocus
-                    />
-                  </PopoverContent>
-                </Popover>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
-        <Button type="submit" disabled={isAdding}>
-          {isAdding ? (
+
+        <Button type="submit" disabled={isPending}>
+          {isPending ? (
             <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
               Đang thêm...

@@ -42,15 +42,7 @@ const Finance = lazy(() => import("@/components/pages/admin/finance/Finance"));
 const Invoices = lazy(
   () => import("@/components/pages/admin/finance/Invoices")
 );
-const Services = lazy(
-  () => import("@/components/pages/staff/services/Services")
-);
-const ServiceDetails = lazy(
-  () => import("@/components/pages/staff/services/ServiceDetails")
-);
-const ServiceRequestDetails = lazy(
-  () => import("@/components/pages/staff/services/ServiceRequestDetails")
-);
+
 const Security = lazy(
   () => import("@/components/pages/staff/security/Security")
 );
@@ -127,12 +119,6 @@ function ProtectedRoutes() {
           <Route path="contracts/:id" element={<ContractDetails />} />
           <Route path="contracts/add" element={<AddContracts />} />
 
-          <Route path="services" element={<Services />} />
-          <Route path="services/:id" element={<ServiceDetails />} />
-          <Route
-            path="services/requests/:requestId?"
-            element={<ServiceRequestDetails />}
-          />
           <Route path="security" element={<Security />} />
 
           <Route path="amenities" element={<Amenities />} />

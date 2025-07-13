@@ -96,6 +96,20 @@ func (a *App) ResendVerifyAccount(email string) (*client.Response, error) {
 	return a.api.Auth().ResendVerifyAccount(email)
 }
 
+func (a *App) SendForgotPasswordEmail(email string) (*client.Response, error) {
+	if a.ctx == nil {
+		return nil, context.Canceled
+	}
+	return a.api.Auth().SendForgotPasswordEmail(email)
+}
+
+func (a *App) ResetPassword(data map[string]interface{}) (*client.Response, error) {
+	if a.ctx == nil {
+		return nil, context.Canceled
+	}
+	return a.api.Auth().ResetPassword(data)
+}
+
 func (a *App) GetUserDetails(userID string) (*client.Response, error) {
 	if a.ctx == nil {
 		return nil, context.Canceled
@@ -104,7 +118,7 @@ func (a *App) GetUserDetails(userID string) (*client.Response, error) {
 	return a.api.User().GetUserDetails(userID)
 }
 
-func (a *App) GetListUsers(page string, keyword string, order string, status string, gender string, statusAccount string, role string) (*client.Response, error) {
+func (a *App) GetListUsers(page string, keyword string, order string, status string, gender string, statusAccount string, role string, hasRoom *bool) (*client.Response, error) {
 	if a.ctx == nil {
 		return nil, context.Canceled
 	}
@@ -115,7 +129,7 @@ func (a *App) GetListUsers(page string, keyword string, order string, status str
 		return nil, errors.New("invalid page number: " + page)
 	}
 
-	return a.api.User().GetListUsers(pageInt, keyword, order, status, gender, statusAccount, role)
+	return a.api.User().GetListUsers(pageInt, keyword, order, status, gender, statusAccount, role, hasRoom)
 }
 
 func (a *App) UpdateUserStatus(userID string, statusAccount string) (*client.Response, error) {
@@ -187,6 +201,22 @@ func (a *App) UpdateRoom(roomID string, roomData map[string]interface{}) (*clien
 	}
 
 	return a.api.Room().UpdateRoom(roomIDInt, roomData)
+}
+
+func (a *App) AddStudentToRoom(roomID string, userID string) (*client.Response, error) {
+	if a.ctx == nil {
+		return nil, context.Canceled
+	}
+	roomIDInt, err := strconv.Atoi(roomID)
+	if err != nil {
+		return nil, errors.New("invalid room ID: " + roomID)
+	}
+	userIDInt, err := strconv.Atoi(userID)
+	if err != nil {
+		return nil, errors.New("invalid user ID: " + userID)
+	}
+
+	return a.api.User().AddStudentToRoom(roomIDInt, userIDInt)
 }
 
 func (a *App) GetContractDetails(contractID string) (*client.Response, error) {
