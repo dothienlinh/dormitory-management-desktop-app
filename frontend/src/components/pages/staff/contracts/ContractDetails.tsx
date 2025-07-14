@@ -1,21 +1,12 @@
-import { useState } from "react";
 import { useParams, Link } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-  CardFooter,
 } from "@/components/ui/card";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -25,215 +16,79 @@ import {
   Edit,
   Printer,
   Download,
-  Clock,
   Building,
   User,
   CalendarDays,
   BanknoteIcon,
-  CheckCircle,
-  XCircle,
-  AlertTriangle,
 } from "lucide-react";
-import { EditContractDialog } from "./components/EditContractDialog";
+// import { EditContractDialog } from "./components/EditContractDialog";
+import { GetContractDetails } from "wailsjs/go/app/App";
+import { Contract } from "@/interfaces/contract";
+import { RoomStatus } from "@/enums/rooms";
+import { getStatusColorContract, getStatusTextContract } from "@/utils/getText";
 
-// Sample data for a contract
-const contractsData = [
-  {
-    id: "1",
-    roomName: "P101",
-    roomId: "101",
-    roomType: "Standard",
-    buildingName: "Tòa A",
-    studentName: "Nguyễn Văn A",
-    studentId: "SV001",
-    studentPhone: "0901234567",
-    studentEmail: "nguyenvana@example.com",
-    startDate: "2023-09-01",
-    endDate: "2024-06-30",
-    monthlyFee: 1500000,
-    deposit: 1500000,
-    status: "active",
-    createdAt: "2023-08-15",
-    terms: [
-      "Sinh viên phải tuân thủ nội quy KTX",
-      "Không gây ồn ào sau 10 giờ tối",
-      "Không hút thuốc trong phòng",
-      "Không nấu ăn trong phòng",
-      "Không nuôi động vật",
-      "Giữ gìn vệ sinh chung",
-      "Thanh toán phí đúng hạn vào ngày 05 hàng tháng",
-    ],
-    paymentSchedule: [
-      {
-        dueDate: "2023-09-05",
-        amount: 1500000,
-        status: "paid",
-        paidDate: "2023-09-03",
-      },
-      {
-        dueDate: "2023-10-05",
-        amount: 1500000,
-        status: "paid",
-        paidDate: "2023-10-02",
-      },
-      {
-        dueDate: "2023-11-05",
-        amount: 1500000,
-        status: "paid",
-        paidDate: "2023-11-05",
-      },
-      {
-        dueDate: "2023-12-05",
-        amount: 1500000,
-        status: "pending",
-        paidDate: null,
-      },
-      {
-        dueDate: "2024-01-05",
-        amount: 1500000,
-        status: "pending",
-        paidDate: null,
-      },
-      {
-        dueDate: "2024-02-05",
-        amount: 1500000,
-        status: "pending",
-        paidDate: null,
-      },
-      {
-        dueDate: "2024-03-05",
-        amount: 1500000,
-        status: "pending",
-        paidDate: null,
-      },
-      {
-        dueDate: "2024-04-05",
-        amount: 1500000,
-        status: "pending",
-        paidDate: null,
-      },
-      {
-        dueDate: "2024-05-05",
-        amount: 1500000,
-        status: "pending",
-        paidDate: null,
-      },
-      {
-        dueDate: "2024-06-05",
-        amount: 1500000,
-        status: "pending",
-        paidDate: null,
-      },
-    ],
-    contractHistory: [
-      {
-        date: "2023-08-15",
-        action: "created",
-        description: "Hợp đồng được tạo",
-        user: "Admin",
-      },
-      {
-        date: "2023-08-15",
-        action: "signed",
-        description: "Hợp đồng được ký bởi sinh viên và quản lý",
-        user: "Admin",
-      },
-      {
-        date: "2023-09-03",
-        action: "payment",
-        description: "Thanh toán phí tháng 9/2023",
-        user: "System",
-      },
-      {
-        date: "2023-10-02",
-        action: "payment",
-        description: "Thanh toán phí tháng 10/2023",
-        user: "System",
-      },
-      {
-        date: "2023-11-05",
-        action: "payment",
-        description: "Thanh toán phí tháng 11/2023",
-        user: "System",
-      },
-    ],
-  },
-  // Other contracts...
-];
-
-// Get status text in Vietnamese
-const getStatusText = (status: string) => {
+// Get room status text in Vietnamese
+const getRoomStatusText = (status: RoomStatus) => {
   switch (status) {
-    case "active":
-      return "Đang hiệu lực";
-    case "expired":
-      return "Đã hết hạn";
-    case "terminated":
-      return "Đã chấm dứt";
+    case RoomStatus.AVAILABLE:
+      return "Có sẵn";
+    case RoomStatus.OCCUPIED:
+      return "Đã có người ở";
+    case RoomStatus.MAINTENANCE:
+      return "Đang bảo trì";
     default:
       return status;
   }
 };
 
-// Get status badge color
-const getStatusColor = (status: string) => {
+// Get room status badge color
+const getRoomStatusColor = (status: RoomStatus) => {
   switch (status) {
-    case "active":
+    case RoomStatus.AVAILABLE:
       return "bg-green-100 text-green-800 hover:bg-green-100";
-    case "expired":
-      return "bg-gray-100 text-gray-800 hover:bg-gray-100";
-    case "terminated":
-      return "bg-red-100 text-red-800 hover:bg-red-100";
+    case RoomStatus.OCCUPIED:
+      return "bg-blue-100 text-blue-800 hover:bg-blue-100";
+    case RoomStatus.MAINTENANCE:
+      return "bg-orange-100 text-orange-800 hover:bg-orange-100";
     default:
       return "";
   }
 };
 
-// Get payment status icon
-const getPaymentStatusIcon = (status: string) => {
-  switch (status) {
-    case "paid":
-      return <CheckCircle className="h-4 w-4 text-green-500" />;
-    case "pending":
-      return <Clock className="h-4 w-4 text-yellow-500" />;
-    case "overdue":
-      return <AlertTriangle className="h-4 w-4 text-red-500" />;
-    default:
-      return null;
-  }
-};
-
-// Get action icon
-const getActionIcon = (action: string) => {
-  switch (action) {
-    case "created":
-      return <FileText className="h-4 w-4 text-blue-500" />;
-    case "signed":
-      return <CheckCircle className="h-4 w-4 text-green-500" />;
-    case "payment":
-      return <BanknoteIcon className="h-4 w-4 text-purple-500" />;
-    case "edited":
-      return <Edit className="h-4 w-4 text-orange-500" />;
-    case "terminated":
-      return <XCircle className="h-4 w-4 text-red-500" />;
-    default:
-      return null;
-  }
-};
-
 export default function ContractDetails() {
   const { id } = useParams<{ id: string }>();
-  const contract = contractsData.find((c) => c.id === id);
-  const [openEditDialog, setOpenEditDialog] = useState(false);
+  // const [openEditDialog, setOpenEditDialog] = useState(false);
 
-  if (!contract) {
+  const {
+    data: contractResponse,
+    isLoading,
+    error,
+  } = useQuery({
+    queryKey: ["contract", id],
+    queryFn: () => GetContractDetails(id!),
+    enabled: !!id,
+  });
+
+  const contract: Contract | null = contractResponse?.ParsedBody?.data || null;
+
+  if (isLoading) {
+    return (
+      <div className="flex h-[70vh] items-center justify-center">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-gray-900"></div>
+      </div>
+    );
+  }
+
+  if (error || !contract) {
     return (
       <div className="flex h-[70vh] items-center justify-center">
         <Card className="max-w-md">
           <CardHeader>
             <CardTitle>Không tìm thấy hợp đồng</CardTitle>
             <CardDescription>
-              Không tìm thấy thông tin hợp đồng với mã {id}
+              {error
+                ? "Có lỗi xảy ra khi tải thông tin hợp đồng"
+                : `Không tìm thấy thông tin hợp đồng với mã ${id}`}
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -260,18 +115,18 @@ export default function ContractDetails() {
           </Link>
           <div>
             <h2 className="text-3xl font-bold tracking-tight">
-              Hợp đồng {contract.id}
+              Hợp đồng {contract.code || contract.id}
             </h2>
             <div className="flex items-center space-x-2">
               <Badge
                 variant="outline"
-                className={getStatusColor(contract.status)}
+                className={getStatusColorContract(contract.status)}
               >
-                {getStatusText(contract.status)}
+                {getStatusTextContract(contract.status)}
               </Badge>
               <p className="text-muted-foreground">
                 Ngày tạo:{" "}
-                {new Date(contract.createdAt).toLocaleDateString("vi-VN")}
+                {new Date(contract.created_at).toLocaleDateString("vi-VN")}
               </p>
             </div>
           </div>
@@ -285,7 +140,7 @@ export default function ContractDetails() {
             <Download className="mr-2 h-4 w-4" />
             Tải PDF
           </Button>
-          <Button onClick={() => setOpenEditDialog(true)}>
+          <Button disabled>
             <Edit className="mr-2 h-4 w-4" />
             Chỉnh sửa
           </Button>
@@ -305,17 +160,17 @@ export default function ContractDetails() {
               <div className="flex items-center justify-between">
                 <span className="text-sm text-muted-foreground">Họ tên:</span>
                 <Link
-                  to={`/staff/students/${contract.studentId}`}
+                  to={`/staff/students/${contract.user_id}`}
                   className="font-medium text-blue-600 hover:underline"
                 >
-                  {contract.studentName}
+                  {contract.user?.full_name || "N/A"}
                 </Link>
               </div>
               <Separator />
 
               <div className="flex items-center justify-between">
                 <span className="text-sm text-muted-foreground">MSSV:</span>
-                <span>{contract.studentId}</span>
+                <span>{contract.user?.student_code || "N/A"}</span>
               </div>
               <Separator />
 
@@ -323,13 +178,13 @@ export default function ContractDetails() {
                 <span className="text-sm text-muted-foreground">
                   Số điện thoại:
                 </span>
-                <span>{contract.studentPhone}</span>
+                <span>{contract.user?.phone || "N/A"}</span>
               </div>
               <Separator />
 
               <div className="flex items-center justify-between">
                 <span className="text-sm text-muted-foreground">Email:</span>
-                <span>{contract.studentEmail}</span>
+                <span>{contract.user?.email || "N/A"}</span>
               </div>
             </div>
           </CardContent>
@@ -347,17 +202,30 @@ export default function ContractDetails() {
               <div className="flex items-center justify-between">
                 <span className="text-sm text-muted-foreground">Mã phòng:</span>
                 <Link
-                  to={`/staff/rooms/${contract.roomId}`}
+                  to={`/staff/rooms/${contract.room_id}`}
                   className="font-medium text-blue-600 hover:underline"
                 >
-                  {contract.roomName}
+                  {contract.room?.room_number || "N/A"}
                 </Link>
               </div>
               <Separator />
 
               <div className="flex items-center justify-between">
-                <span className="text-sm text-muted-foreground">Tòa nhà:</span>
-                <span>{contract.buildingName}</span>
+                <span className="text-sm text-muted-foreground">
+                  Trạng thái phòng:
+                </span>
+                <Badge
+                  variant="outline"
+                  className={
+                    contract.room?.status
+                      ? getRoomStatusColor(contract.room.status)
+                      : ""
+                  }
+                >
+                  {contract.room?.status
+                    ? getRoomStatusText(contract.room.status)
+                    : "N/A"}
+                </Badge>
               </div>
               <Separator />
 
@@ -365,8 +233,91 @@ export default function ContractDetails() {
                 <span className="text-sm text-muted-foreground">
                   Loại phòng:
                 </span>
-                <span>{contract.roomType}</span>
+                <span>{contract.room?.room_category?.name || "N/A"}</span>
               </div>
+              <Separator />
+
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-muted-foreground">Sức chứa:</span>
+                <span>
+                  {contract.room?.room_category?.capacity
+                    ? `${contract.room.room_category.capacity} người`
+                    : "N/A"}
+                </span>
+              </div>
+              <Separator />
+
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-muted-foreground">
+                  Diện tích:
+                </span>
+                <span>
+                  {contract.room?.room_category?.acreage
+                    ? `${contract.room.room_category.acreage} m²`
+                    : "N/A"}
+                </span>
+              </div>
+              <Separator />
+
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-muted-foreground">
+                  Số người hiện tại:
+                </span>
+                <span>
+                  {contract.room?.user_count !== undefined
+                    ? `${contract.room.user_count} người`
+                    : "N/A"}
+                </span>
+              </div>
+              <Separator />
+
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-muted-foreground">
+                  Giá phòng gốc:
+                </span>
+                <span className="font-medium">
+                  {contract.room?.room_category?.price
+                    ? `${contract.room.room_category.price.toLocaleString()} VND/tháng`
+                    : "N/A"}
+                </span>
+              </div>
+
+              {contract.room?.room_category?.description && (
+                <>
+                  <Separator />
+                  <div>
+                    <span className="text-sm text-muted-foreground">
+                      Mô tả loại phòng:
+                    </span>
+                    <div className="mt-1 text-sm">
+                      {contract.room.room_category.description}
+                    </div>
+                  </div>
+                </>
+              )}
+
+              {contract.room?.room_amenities &&
+                contract.room.room_amenities.length > 0 && (
+                  <>
+                    <Separator />
+                    <div>
+                      <span className="text-sm text-muted-foreground">
+                        Tiện ích:
+                      </span>
+                      <div className="mt-2 flex flex-wrap gap-1">
+                        {contract.room.room_amenities.map((roomAmenity) => (
+                          <Badge
+                            key={roomAmenity.id}
+                            variant="secondary"
+                            className="text-xs"
+                          >
+                            {roomAmenity.amenity?.name || "N/A"}
+                          </Badge>
+                        ))}
+                      </div>
+                    </div>
+                  </>
+                )}
             </div>
           </CardContent>
         </Card>
@@ -386,8 +337,8 @@ export default function ContractDetails() {
                     Thời hạn:
                   </span>
                   <span>
-                    {new Date(contract.startDate).toLocaleDateString("vi-VN")} -{" "}
-                    {new Date(contract.endDate).toLocaleDateString("vi-VN")}
+                    {new Date(contract.start_date).toLocaleDateString("vi-VN")}{" "}
+                    - {new Date(contract.end_date).toLocaleDateString("vi-VN")}
                   </span>
                 </div>
                 <Separator />
@@ -397,30 +348,26 @@ export default function ContractDetails() {
                     Phí thuê hàng tháng:
                   </span>
                   <span className="font-medium">
-                    {contract.monthlyFee.toLocaleString()} VND
+                    {contract.price.toLocaleString()} VND
                   </span>
                 </div>
                 <Separator />
 
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-muted-foreground">
-                    Tiền đặt cọc:
-                  </span>
+                  <span className="text-sm text-muted-foreground">Mô tả:</span>
                   <span className="font-medium">
-                    {contract.deposit.toLocaleString()} VND
+                    {contract.description || "N/A"}
                   </span>
                 </div>
               </div>
 
               <div>
                 <span className="text-sm text-muted-foreground">
-                  Điều khoản hợp đồng:
+                  Mô tả hợp đồng:
                 </span>
-                <ul className="mt-2 space-y-1 pl-5 text-sm list-disc">
-                  {contract.terms.map((term, index) => (
-                    <li key={index}>{term}</li>
-                  ))}
-                </ul>
+                <div className="mt-2 text-sm">
+                  {contract.description || "Không có mô tả"}
+                </div>
               </div>
             </div>
           </CardContent>
@@ -430,90 +377,17 @@ export default function ContractDetails() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <BanknoteIcon className="h-5 w-5" />
-              Lịch thanh toán
+              Thông tin thanh toán
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="rounded-md border">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Kỳ thanh toán</TableHead>
-                    <TableHead>Ngày đến hạn</TableHead>
-                    <TableHead>Số tiền</TableHead>
-                    <TableHead>Trạng thái</TableHead>
-                    <TableHead>Ngày thanh toán</TableHead>
-                    <TableHead></TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {contract.paymentSchedule.map((payment, index) => (
-                    <TableRow key={index}>
-                      <TableCell>
-                        Tháng {index + 9}/2023 -{" "}
-                        {index + 9 > 12 ? index + 9 - 12 : index + 9}/
-                        {index + 9 > 12 ? "2024" : "2023"}
-                      </TableCell>
-                      <TableCell>
-                        {new Date(payment.dueDate).toLocaleDateString("vi-VN")}
-                      </TableCell>
-                      <TableCell>
-                        {payment.amount.toLocaleString()} VND
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex items-center space-x-2">
-                          {getPaymentStatusIcon(payment.status)}
-                          <span>
-                            {payment.status === "paid"
-                              ? "Đã thanh toán"
-                              : "Chưa thanh toán"}
-                          </span>
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        {payment.paidDate
-                          ? new Date(payment.paidDate).toLocaleDateString(
-                              "vi-VN"
-                            )
-                          : "-"}
-                      </TableCell>
-                      <TableCell>
-                        {payment.status === "pending" && (
-                          <Button variant="outline" size="sm">
-                            Thanh toán
-                          </Button>
-                        )}
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+            <div className="text-center py-8 text-muted-foreground">
+              <p>Thông tin thanh toán chi tiết sẽ được cập nhật sau</p>
+              <p className="text-sm mt-2">
+                Hiện tại chỉ hiển thị thông tin cơ bản của hợp đồng
+              </p>
             </div>
           </CardContent>
-          <CardFooter className="flex justify-between">
-            <div>
-              <span className="text-sm text-muted-foreground">
-                Đã thanh toán:
-              </span>
-              <span className="ml-2 font-medium">
-                {(
-                  contract.paymentSchedule.filter((p) => p.status === "paid")
-                    .length * contract.monthlyFee
-                ).toLocaleString()}{" "}
-                VND
-              </span>
-            </div>
-            <div>
-              <span className="text-sm text-muted-foreground">Còn lại:</span>
-              <span className="ml-2 font-medium">
-                {(
-                  contract.paymentSchedule.filter((p) => p.status !== "paid")
-                    .length * contract.monthlyFee
-                ).toLocaleString()}{" "}
-                VND
-              </span>
-            </div>
-          </CardFooter>
         </Card>
 
         <Card className="md:col-span-2">
@@ -522,37 +396,35 @@ export default function ContractDetails() {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {contract.contractHistory.map((event, index) => (
-                <div key={index} className="flex space-x-4">
-                  <div className="flex-shrink-0 mt-1">
-                    {getActionIcon(event.action)}
-                  </div>
-                  <div className="flex-1 space-y-1">
-                    <div className="flex items-center justify-between">
-                      <p className="font-medium text-sm">{event.description}</p>
-                      <span className="text-xs text-muted-foreground">
-                        {new Date(event.date).toLocaleDateString("vi-VN")}
-                      </span>
-                    </div>
-                    <p className="text-xs text-muted-foreground">
-                      Thực hiện bởi: {event.user}
-                    </p>
-                    {index < contract.contractHistory.length - 1 && (
-                      <Separator className="mt-3" />
-                    )}
-                  </div>
+              <div className="flex space-x-4">
+                <div className="flex-shrink-0 mt-1">
+                  <FileText className="h-4 w-4 text-blue-500" />
                 </div>
-              ))}
+                <div className="flex-1 space-y-1">
+                  <div className="flex items-center justify-between">
+                    <p className="font-medium text-sm">Hợp đồng được tạo</p>
+                    <span className="text-xs text-muted-foreground">
+                      {new Date(contract.created_at).toLocaleDateString(
+                        "vi-VN"
+                      )}
+                    </span>
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    Thực hiện bởi: System
+                  </p>
+                </div>
+              </div>
             </div>
           </CardContent>
         </Card>
       </div>
 
-      <EditContractDialog
+      {/* TODO: Update EditContractDialog to work with new Contract interface */}
+      {/* <EditContractDialog
         open={openEditDialog}
         onOpenChange={setOpenEditDialog}
         contract={contract}
-      />
+      /> */}
     </div>
   );
 }

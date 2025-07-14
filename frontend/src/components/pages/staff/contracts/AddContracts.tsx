@@ -237,8 +237,9 @@ export default function AddContracts() {
   );
 
   const handleRoomSelect = useCallback(
-    (roomId: number) => {
-      form.setValue("room_id", roomId);
+    (room: Room) => {
+      form.setValue("room_id", room.id);
+      form.setValue("price", room.room_category.price);
       setOpenPopoverRoom(false);
     },
     [form]
@@ -465,7 +466,7 @@ export default function AddContracts() {
                                           key={room.id}
                                           value={room.room_number}
                                           onSelect={() =>
-                                            handleRoomSelect(room.id)
+                                            handleRoomSelect(room)
                                           }
                                         >
                                           <CheckIcon
@@ -627,14 +628,7 @@ export default function AddContracts() {
                         <FormItem>
                           <FormLabel>Giá thuê hàng tháng (VND)</FormLabel>
                           <FormControl>
-                            <Input
-                              type="number"
-                              placeholder="1500000"
-                              {...field}
-                              onChange={(e) =>
-                                field.onChange(parseInt(e.target.value) || 0)
-                              }
-                            />
+                            <Input disabled placeholder="1500000" {...field} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
