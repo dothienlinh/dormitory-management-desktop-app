@@ -92,7 +92,7 @@ export default function StudentDetails() {
                 <TabsList>
                   <TabsTrigger value="contracts">Hợp đồng</TabsTrigger>
                   <TabsTrigger value="payments">Thanh toán</TabsTrigger>
-                  <TabsTrigger value="disciplinary">Kỷ luật</TabsTrigger>
+                  {/* <TabsTrigger value="disciplinary">Kỷ luật</TabsTrigger> */}
                 </TabsList>
               </div>
             </CardHeader>
